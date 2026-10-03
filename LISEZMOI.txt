@@ -1,13 +1,13 @@
-﻿============================================================
+============================================================
   ELITE HEAD MOTION v0.1 - par swaatche
   Mouvements de tête et secousses du pilote
 ============================================================
 
-Ce mod fait bouger la vue du cockpit comme la tête d'un vrai
-pilote :
+Ce mod amplifie les mouvements de tête dans le cockpit :
+
   - le regard suit les virages ;
   - la tête est poussée en accélérant, en freinant et en strafant ;
-  - le cockpit secoue sous les dégâts, aux sauts FSD, au boost...
+  - le cockpit subit des secousses sous les dégâts, aux sauts FSD, au boost...
 
 Il fonctionne AVEC ou SANS head tracker (Tobii, TrackIR,
 webcam...). Le choix se fait dans la page de réglages.
@@ -29,15 +29,13 @@ TrackIR (head tracking).
   - Facultatif : un head tracker reconnu par OpenTrack
     (Tobii Eye Tracker, TrackIR, webcam...).
 
-Python n'est pas nécessaire.
-
 
 ------------------------------------------------------------
 2. INSTALLATION
 ------------------------------------------------------------
 
-  1. Copie le dossier du mod où tu veux (par exemple dans
-     Documents). Garde l'exe dans son dossier : tes réglages
+  1. Copiez le dossier du mod où vous voulez (par exemple dans
+     Documents). Gardez l'exe dans son dossier : les réglages
      y sont enregistrés.
   2. Rien à régler dans Elite : le jeu reconnaît le mod tout
      seul au démarrage (comme un TrackIR).
@@ -55,20 +53,20 @@ En haut de la page de réglages, la liste déroulante
   - TrackIR (via OpenTrack)
   - Autre tracker : webcam, smartphone... (via OpenTrack)
 
-Clique sur le bouton "?" à côté de la liste : il affiche la
+Cliquez sur le bouton "?" à côté de la liste : il affiche la
 mise en place pas à pas pour le mode choisi (OpenTrack,
 logiciels Tobii ou TrackIR). Le changement de mode s'applique
 tout de suite, sans relancer le mod.
 
 En résumé :
   - Sans head tracker : OpenTrack installé mais PAS lancé.
-  - Avec un tracker : dans OpenTrack, entrée = ton tracker,
+  - Avec un tracker : dans OpenTrack, entrée = votre tracker,
     sortie = "UDP over network", adresse 127.0.0.1,
-    port 5555. Puis clique sur Start.
-    Ne choisis PAS la sortie "freetrack".
-  - Un seul head tracking à la fois : ferme Tobii Game Hub
+    port 5555. Puis cliquez sur Start.
+    Ne pas choisir la sortie "freetrack".
+  - Un seul head tracking à la fois : fermez Tobii Game Hub
     (c'est lui qui pilote la vue dans Elite) et le logiciel
-    TrackIR de NaturalPoint.
+    TrackIR de NaturalPoint doit être désactivé.
   - Avec un Tobii : Tobii Experience doit rester OUVERT (il
     fait fonctionner le Tobii), seul Tobii Game Hub est fermé.
 
@@ -79,32 +77,31 @@ En résumé :
 
   1. Avec un tracker seulement : lance OpenTrack et clique
      sur Start.
-  2. Lance EliteHeadMotion.exe. Une fenêtre noire s'ouvre
-     (laisse-la ouverte), puis la page de réglages s'ouvre
-     dans ton navigateur.
+  2. Lance EliteHeadMotion.exe. Le terminal lance le mode, 
+     puis la page de réglages s'ouvre dans le navigateur.
      Si elle ne s'ouvre pas : http://127.0.0.1:8765
-  3. Lance Elite Dangerous APRÈS le mod.
+  3. Lancer Elite Dangerous APRÈS le mod.
   4. Sur la page, le bandeau "Effets actifs dans le jeu" doit
      être vert.
 
-  Pour quitter : ferme la fenêtre noire.
+  Pour quitter : cliquer sur "Quitter", cela ferme le serveur.
 
 
 ------------------------------------------------------------
-5. PREMIER RÉGLAGE : TES COMMANDES
+5. PREMIER RÉGLAGE : LES COMMANDES
 ------------------------------------------------------------
 
-Sur la page de réglages, section "Axes HOTAS", clique sur
-"Détecter" pour chaque ligne, puis bouge l'axe ou appuie sur
+Sur la page de réglages, section "Axes HOTAS", cliquez sur
+"Détecter" pour chaque ligne, puis bougez l'axe ou appuiez sur
 la touche :
 
   - Tangage, Lacet, Roulis, Gaz
-  - Latéral et Vertical : propulseurs (facultatif)
-  - Boost : touche ou bouton de boost (Tab par défaut dans Elite)
+  - Latéral et Vertical : propulseurs
+  - Boost : touche ou bouton de boost
   - Pause : touche Pause/Attn par défaut
 
-Si ta manette des gaz a un zéro au centre (marche arrière),
-coche "Gaz avec zéro au centre" dans la section Secousses.
+Si la manette des gaz a un zéro au centre (marche arrière),
+cochez "Gaz avec zéro au centre" dans la section Secousses.
 
 
 ------------------------------------------------------------
@@ -117,21 +114,14 @@ coche "Gaz avec zéro au centre" dans la section Secousses.
 
   PRÉRÉGLAGES
     Faible / Standard / Renforcé. Ils changent la force des
-    mouvements et des secousses, sans toucher à tes commandes.
+    mouvements et des secousses, sans toucher aux commandes.
 
   PROFILS
-    Enregistre tes réglages sous un nom (combat, exploration,
-    minage...) et recharge-les en un clic. Un profil ne change
-    ni tes commandes ni ton mode d'utilisation.
+    Enregistre les réglages sous un nom. 
+    Un profil ne change ni les commandes ni le mode d'utilisation.
 
   RÉGLAGES EN DIRECT
     Chaque curseur s'applique immédiatement, même en vol.
-    "Tester une secousse" permet d'essayer l'intensité.
-
-  SUPERCROISIÈRE
-    Aucune secousse pendant le vol en supercroisière.
-    Elles restent à l'entrée, à la sortie, pendant la charge
-    du FSD et pendant les interdictions.
 
 
 ------------------------------------------------------------
@@ -142,16 +132,14 @@ La page de réglages a deux onglets : "Caméra" (les mouvements
 de tête) et "Bruitages". Les bruitages s'ajoutent aux sons du
 jeu et suivent l'état du vaisseau :
 
-  AMBIANCE COCKPIT    tes fichiers du dossier "sons\ambiance",
-                      joués au hasard l'un après l'autre quand
-                      tu es à bord (dossier vide : ambiance
-                      synthétisée)
+  AMBIANCE COCKPIT    Les fichiers du dossier "sons\ambiance",
+                      joués au hasard l'un après l'autre.
   ALERTES DE FOND     bips de console et carillons lointains ;
-                      alerte sourde en cas de danger, surchauffe,
+                      alerte étouffée en cas de danger, surchauffe,
                       carburant bas ou interdiction
-  RADIO DU CONTRÔLE   extraits de tes enregistrements, étouffés
-                      comme sur la fréquence de la station, en
-                      fond tout le temps où tu es près d'une
+  RADIO DU CONTRÔLE   extraits des enregistrements présents, 
+		      en arrière plan sur la fréquence de la 
+		      station, tout le temps à proximité d'une
                       station ou d'une installation (arrivée,
                       appontage, décollage, sortie) ; coupés
                       moteurs arrêtés sur le pad. Courtes
@@ -161,18 +149,6 @@ jeu et suivent l'état du vaisseau :
 
 Chaque catégorie s'active ou se coupe séparément, avec son
 volume et un bouton "Écouter" pour l'essayer.
-
-Ambiance cockpit : dépose tes fichiers .wav, .ogg, .mp3 ou
-.flac dans le dossier "sons\ambiance" à côté de l'exe. Ils
-sont joués au hasard, avec une pause réglable entre deux
-fichiers. Les longues ambiances sont lues en flux.
-
-Radio du contrôle : dépose des fichiers .wav, .ogg, .mp3 ou
-.flac dans le dossier "sons\radio" à côté de l'exe. Des
-extraits de 3 à 8 s sont pris au hasard et passent dans le
-filtre radio (étouffement réglable). Sans fichier, la radio
-reste muette. N'utilise que des enregistrements que tu as le
-droit d'utiliser.
 
 Les bruitages utilisent le journal d'Elite : si la page
 indique "Journal introuvable", ils ne savent pas quand jouer.
@@ -188,39 +164,39 @@ indique "Journal introuvable", ils ne savent pas quand jouer.
        ou OpenTrack réglé en sortie "freetrack".
 
   Message "OpenTrack introuvable"
-    -> Installe OpenTrack. S'il est installé ailleurs, ouvre
+    -> Installez OpenTrack. S'il est installé ailleurs, ouvrez
        config.json (à côté de l'exe) avec le Bloc-notes et
-       indique son dossier :
+       indiquez son dossier :
        "opentrack_dir": "C:/Program Files (x86)/opentrack"
 
   "Jeu non connecté" sur la page
-    -> Lance Elite APRÈS le mod : le jeu cherche le TrackIR
+    -> Lancez Elite APRÈS le mod : le jeu cherche le TrackIR
        à son démarrage.
 
   Le tracker est marqué "—" (rien reçu)
     -> OpenTrack n'est pas lancé (Start), ou sa sortie n'est
        pas "UDP over network" vers 127.0.0.1, port 5555.
-       Clique sur "?" pour revoir la mise en place.
+       Cliquez sur "?" pour revoir la mise en place.
 
   "Port indisponible"
-    -> Un autre programme utilise déjà ce port. Change-le dans
-       "Mode d'utilisation", et mets le même dans la sortie
+    -> Un autre programme utilise déjà ce port. Changez-le dans
+       "Mode d'utilisation", et mettez le même dans la sortie
        d'OpenTrack.
 
   La vue ne bouge pas quand je pilote
-    -> Refais "Détecter" pour tes axes (section Axes HOTAS).
+    -> Refaire "Détecter" pour les axes (section Axes HOTAS).
 
   "Journal introuvable"
     -> Les secousses du jeu et la détection de la
        supercroisière ne marchent pas. Dans config.json,
-       indique le dossier du journal d'Elite :
+       indiquez le dossier du journal d'Elite :
        "journal_dir": "C:/Users/TON_NOM/Saved Games/Frontier Developments/Elite Dangerous"
 
   Un mouvement part du mauvais côté
     -> Section "Inverser un mouvement" sur la page.
 
   Aucun bruitage
-    -> Onglet "Bruitages" : vérifie que les bruitages sont
+    -> Onglet "Bruitages" : vérifiez que les bruitages sont
        activés et le volume. Le statut indique si l'audio est
        disponible. Les sons ne jouent qu'à bord du vaisseau.
 
@@ -229,7 +205,7 @@ indique "Journal introuvable", ils ne savent pas quand jouer.
 
   L'antivirus bloque l'exe
     -> Faux positif courant pour ce type de programme :
-       ajoute une exception pour le dossier du mod.
+       ajoutez une exception pour le dossier du mod.
 
 
 ------------------------------------------------------------

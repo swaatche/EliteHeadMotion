@@ -162,10 +162,10 @@
 <div id="stopped" hidden>
   <div class="stopbox">
     <h2 data-i18n>Mod arrêté</h2>
-    <p data-i18n>Le mod s’est arrêté proprement et la vue est revenue à la normale. Tu peux fermer cette page.</p>
+    <p data-i18n>Le mod s’est arrêté proprement et la vue est revenue à la normale. Cette page peut être fermée.</p>
   </div>
 </div>
-<div id="offline" data-i18n-html>Le script ne répond pas. Lance <code>EliteHeadMotion.exe</code> (ou <code>py elite_headmotion.py</code>) puis recharge la page.</div>
+<div id="offline" data-i18n-html>Le script ne répond pas. Lancer <code>EliteHeadMotion.exe</code> (ou <code>py elite_headmotion.py</code>) puis recharger la page.</div>
 
 <main>
   <aside>
@@ -177,7 +177,7 @@
     </div>
     <div class="card">
       <h2 data-i18n>En direct</h2>
-      <p class="intro" data-i18n>Mouvement ajouté à ta tête (effets + secousses).</p>
+      <p class="intro" data-i18n>Mouvement ajouté à la tête (effets + secousses).</p>
       <div id="monitor"></div>
       <div class="meter">
         <div class="lbl"><span data-i18n>Secousse</span><b id="shakeVal">0.00</b></div>
@@ -212,21 +212,21 @@ const EN = {
   // En-tête, état, direct
   'Jeu': 'Game', 'Quitter': 'Quit', 'Arrête le mod et remet la vue au centre': 'Stops the mod and recentres the view',
   'Quitter le mod ? Les effets et les bruitages s’arrêtent.': 'Quit the mod? Effects and sounds will stop.', 'Mod arrêté': 'Mod stopped',
-  'Le mod s’est arrêté proprement et la vue est revenue à la normale. Tu peux fermer cette page.': 'The mod stopped cleanly and the view is back to normal. You can close this page.', 'Raccourci : touche Pause (réglable dans Axes HOTAS)': 'Shortcut: Pause key (set it in HOTAS axes)',
-  'Le script ne répond pas. Lance <code>EliteHeadMotion.exe</code> (ou <code>py elite_headmotion.py</code>) puis recharge la page.':
+  'Le mod s’est arrêté proprement et la vue est revenue à la normale. Cette page peut être fermée.': 'The mod stopped cleanly and the view is back to normal. You can close this page.', 'Raccourci : touche Pause (réglable dans Axes HOTAS)': 'Shortcut: Pause key (set it in HOTAS axes)',
+  'Le script ne répond pas. Lancer <code>EliteHeadMotion.exe</code> (ou <code>py elite_headmotion.py</code>) puis recharger la page.':
     'The mod is not responding. Start <code>EliteHeadMotion.exe</code> (or <code>py elite_headmotion.py</code>) then reload the page.',
   'État dans le jeu': 'In-game status', 'En attente du script…': 'Waiting for the mod…', 'En direct': 'Live',
-  'Mouvement ajouté à ta tête (effets + secousses).': 'Motion added to your head (effects + shakes).',
+  'Mouvement ajouté à la tête (effets + secousses).': 'Motion added to your head (effects + shakes).',
   'Secousse': 'Shake', 'Derniers chocs': 'Latest impacts',
   'Lacet': 'Yaw', 'Tangage': 'Pitch', 'Roulis': 'Roll', 'Latéral': 'Lateral', 'Vertical': 'Vertical', 'Avant/arrière': 'Fore/aft', 'Gaz': 'Throttle',
   'Mode test': 'Test mode', 'Le script ne tourne pas sous Windows : rien n’est envoyé au jeu.': 'Not running on Windows: nothing is sent to the game.',
   'Relié à Elite': 'Linked to Elite', '{game} a chargé le TrackIR du mod.': '{game} loaded the mod’s TrackIR.',
-  'Pas relié au jeu': 'Not linked to the game', 'Lance Elite après le script (Elite détecte le TrackIR au démarrage).': 'Start Elite after the mod (Elite detects TrackIR at startup).',
+  'Pas relié au jeu': 'Not linked to the game', 'Lancer Elite après le script (Elite détecte le TrackIR au démarrage).': 'Start Elite after the mod (Elite detects TrackIR at startup).',
   'Conflit': 'Conflict', 'Un autre programme envoie aussi la position de tête (OpenTrack en sortie freetrack ?).': 'Another program is also sending a head position (OpenTrack with freetrack output?).',
   'Aucun conflit': 'No conflict', 'Le mod est le seul à piloter la vue.': 'The mod is the only one driving the view.',
   'Aucun périphérique détecté.': 'No device detected.',
   'Journal Elite': 'Elite journal',
-  'Introuvable : supercroisière non détectée (secousses non coupées) et pas de secousses sur événements. Renseigne journal_dir dans config.json.':
+  'Introuvable : supercroisière non détectée (secousses non coupées) et pas de secousses sur événements. Renseigner journal_dir dans config.json.':
     'Not found: supercruise not detected (shakes not muted) and no event shakes. Set journal_dir in config.json.',
   'Dans le vaisseau': 'In the ship', 'Les événements du jeu déclenchent les secousses.': 'Game events trigger shakes.',
   'Hors du vaisseau': 'Out of the ship', 'Pas aux commandes (menu, SRV ou chasseur ?).': 'Not at the controls (menu, SRV or fighter?).',
@@ -237,56 +237,56 @@ const EN = {
   'Jeu non connecté': 'Game not connected', 'Journal introuvable': 'Journal not found', 'Supercroisière : secousses coupées': 'Supercruise: shakes muted',
   'Modifié…': 'Modified…', 'Enregistré ✓': 'Saved ✓', 'Erreur d’enregistrement': 'Save error', 'Script injoignable': 'Mod unreachable',
   // Mode d'utilisation
-  'Mode d’utilisation': 'Usage mode', 'Choisis si tu joues avec un head tracker ou non. Le changement s’applique tout de suite.': 'Choose whether you play with a head tracker or not. Changes apply immediately.',
+  'Mode d’utilisation': 'Usage mode', 'Choisir de jouer avec ou sans head tracker. Le changement s’applique immédiatement.': 'Choose whether you play with a head tracker or not. Changes apply immediately.',
   'Aide pour ce mode': 'Help for this mode', 'Port UDP de réception (sortie d’OpenTrack) :': 'Receiving UDP port (OpenTrack output):',
   'Fermer': 'Close', 'Mise en place — ': 'Setup — ',
-  'Non utilisé : vue fixe + effets du mod.': 'Not used: fixed view + mod effects.', ' (change le port dans Mode d’utilisation).': ' (change the port in Usage mode).',
+  'Non utilisé : vue fixe + effets du mod.': 'Not used: fixed view + mod effects.', ' (changer le port dans Mode d’utilisation).': ' (change the port in Usage mode).',
   'Position de tête reçue d’OpenTrack.': 'Head position received from OpenTrack.',
   'Rien reçu : OpenTrack lancé (Start), sortie UDP 127.0.0.1:{port} ?': 'Nothing received: is OpenTrack started (Start), output UDP 127.0.0.1:{port}?',
   'Sans head tracker (vue fixe)': 'No head tracker (fixed view)', 'Sans head tracker': 'No head tracker',
   'Aucun matériel : la vue part du centre et le mod y ajoute ses effets.': 'No hardware: the view starts from the centre and the mod adds its effects.',
-  'OpenTrack doit être <b>installé</b>, mais <b>pas lancé</b> (s’il tourne, ferme-le).': 'OpenTrack must be <b>installed</b> but <b>not running</b> (close it if it is).',
-  'Lance le mod, <b>puis</b> Elite. Le bandeau « Effets actifs dans le jeu » doit passer au vert.': 'Start the mod, <b>then</b> Elite. The “Effects active in game” banner should turn green.',
+  'OpenTrack doit être <b>installé</b>, mais <b>pas lancé</b> (s’il tourne, le fermer).': 'OpenTrack must be <b>installed</b> but <b>not running</b> (close it if it is).',
+  'Lancer le mod, <b>puis</b> Elite. Le bandeau « Effets actifs dans le jeu » doit passer au vert.': 'Start the mod, <b>then</b> Elite. The “Effects active in game” banner should turn green.',
   'Tobii Eye Tracker (via OpenTrack)': 'Tobii Eye Tracker (via OpenTrack)',
-  'Ton Tobii pilote la vue, le mod y ajoute ses effets.': 'Your Tobii drives the view, the mod adds its effects.',
+  'Le Tobii pilote la vue, le mod y ajoute ses effets.': 'Your Tobii drives the view, the mod adds its effects.',
   'Dans OpenTrack : entrée <code>Tobii Eye Tracker</code> ; sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.':
     'In OpenTrack: input <code>Tobii Eye Tracker</code>; output <code>UDP over network</code>, address <code>127.0.0.1</code>, port <code>{port}</code>.',
-  'Clique sur <b>Start</b> dans OpenTrack.': 'Click <b>Start</b> in OpenTrack.',
-  'Lance le mod, <b>puis</b> Elite. L’indicateur « Tobii ✓ » doit s’allumer.': 'Start the mod, <b>then</b> Elite. The “Tobii ✓” indicator should light up.',
-  'Ne choisis pas la sortie « freetrack » dans OpenTrack : elle entrerait en conflit avec le mod.': 'Do not pick the “freetrack” output in OpenTrack: it would conflict with the mod.',
-  'TrackIR (via OpenTrack)': 'TrackIR (via OpenTrack)', 'Ton TrackIR pilote la vue, le mod y ajoute ses effets.': 'Your TrackIR drives the view, the mod adds its effects.',
+  'Cliquer sur <b>Start</b> dans OpenTrack.': 'Click <b>Start</b> in OpenTrack.',
+  'Lancer le mod, <b>puis</b> Elite. L’indicateur « Tobii ✓ » doit s’allumer.': 'Start the mod, <b>then</b> Elite. The “Tobii ✓” indicator should light up.',
+  'Ne pas choisir la sortie « freetrack » dans OpenTrack : elle entrerait en conflit avec le mod.': 'Do not pick the “freetrack” output in OpenTrack: it would conflict with the mod.',
+  'TrackIR (via OpenTrack)': 'TrackIR (via OpenTrack)', 'Le TrackIR pilote la vue, le mod y ajoute ses effets.': 'Your TrackIR drives the view, the mod adds its effects.',
   'Le logiciel TrackIR de NaturalPoint doit rester fermé.': 'NaturalPoint’s TrackIR software must stay closed.',
-  '<b>Ferme le logiciel TrackIR</b> de NaturalPoint : il enverrait sa propre position au jeu, en conflit avec le mod.': '<b>Close NaturalPoint’s TrackIR software</b>: it would send its own position to the game, conflicting with the mod.',
-  'Dans OpenTrack : choisis l’entrée compatible avec ta caméra TrackIR (selon ta version d’OpenTrack) ; sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.':
+  '<b>Fermer le logiciel TrackIR</b> de NaturalPoint : il enverrait sa propre position au jeu, en conflit avec le mod.': '<b>Close NaturalPoint’s TrackIR software</b>: it would send its own position to the game, conflicting with the mod.',
+  'Dans OpenTrack : choisir l’entrée compatible avec la caméra TrackIR (selon la version d’OpenTrack) ; sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.':
     'In OpenTrack: pick the input that supports your TrackIR camera (depends on your OpenTrack version); output <code>UDP over network</code>, address <code>127.0.0.1</code>, port <code>{port}</code>.',
-  'Lance le mod, <b>puis</b> Elite. L’indicateur « TrackIR ✓ » doit s’allumer.': 'Start the mod, <b>then</b> Elite. The “TrackIR ✓” indicator should light up.',
-  'Si ta version d’OpenTrack ne reconnaît pas ta caméra TrackIR, ce mode ne peut pas l’utiliser : le logiciel NaturalPoint ne peut pas tourner en même temps que le mod.':
+  'Lancer le mod, <b>puis</b> Elite. L’indicateur « TrackIR ✓ » doit s’allumer.': 'Start the mod, <b>then</b> Elite. The “TrackIR ✓” indicator should light up.',
+  'Si la version d’OpenTrack installée ne reconnaît pas la caméra TrackIR, ce mode ne peut pas l’utiliser : le logiciel NaturalPoint ne peut pas tourner en même temps que le mod.':
     'If your OpenTrack version does not recognise your TrackIR camera, this mode cannot use it: NaturalPoint’s software cannot run at the same time as the mod.',
   'Autre tracker : webcam, smartphone… (via OpenTrack)': 'Other tracker: webcam, smartphone… (via OpenTrack)', 'Head tracker': 'Head tracker',
   'N’importe quel tracker reconnu par OpenTrack pilote la vue, le mod y ajoute ses effets.': 'Any tracker supported by OpenTrack drives the view, the mod adds its effects.',
-  'Dans OpenTrack : choisis l’entrée de ton tracker (par exemple <code>neuralnet tracker</code> pour une webcam).': 'In OpenTrack: pick your tracker’s input (e.g. <code>neuralnet tracker</code> for a webcam).',
+  'Dans OpenTrack : choisir l’entrée du tracker (par exemple <code>neuralnet tracker</code> pour une webcam).': 'In OpenTrack: pick your tracker’s input (e.g. <code>neuralnet tracker</code> for a webcam).',
   'Sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.': 'Output <code>UDP over network</code>, address <code>127.0.0.1</code>, port <code>{port}</code>.',
-  'Lance le mod, <b>puis</b> Elite. L’indicateur « Head tracker ✓ » doit s’allumer.': 'Start the mod, <b>then</b> Elite. The “Head tracker ✓” indicator should light up.',
-  'Si ton tracker envoie lui-même en UDP vers OpenTrack, utilise un autre port que {port} pour cette entrée.': 'If your tracker itself sends UDP to OpenTrack, use a port other than {port} for that input.',
-  'Aucun autre head tracking ne doit être actif : si tu as un Tobii, ferme <b>Tobii Game Hub</b> ; si tu as un TrackIR, ferme le logiciel TrackIR.': 'No other head tracking must be active: if you own a Tobii, close <b>Tobii Game Hub</b>; if you own a TrackIR, close the TrackIR software.',
+  'Lancer le mod, <b>puis</b> Elite. L’indicateur « Head tracker ✓ » doit s’allumer.': 'Start the mod, <b>then</b> Elite. The “Head tracker ✓” indicator should light up.',
+  'Si le tracker envoie lui-même en UDP vers OpenTrack, utiliser un autre port que {port} pour cette entrée.': 'If your tracker itself sends UDP to OpenTrack, use a port other than {port} for that input.',
+  'Aucun autre head tracking ne doit être actif : avec un Tobii, fermer <b>Tobii Game Hub</b> ; avec un TrackIR, fermer le logiciel TrackIR.': 'No other head tracking must be active: if you own a Tobii, close <b>Tobii Game Hub</b>; if you own a TrackIR, close the TrackIR software.',
   'Tobii Game Hub doit rester fermé (Tobii Experience reste ouvert) : le mod ne peut pas le vérifier.': 'Tobii Game Hub must stay closed (Tobii Experience stays open): the mod cannot check it.',
   '<b>Tobii Experience</b> doit rester ouvert (il fait fonctionner le Tobii), Tobii calibré.': '<b>Tobii Experience</b> must stay open (it runs the Tobii), Tobii calibrated.',
-  '<b>Ferme Tobii Game Hub</b> : c’est lui qui fait bouger la vue directement dans Elite. S’il reste ouvert, deux sources pilotent la vue et l’image saccade.': '<b>Close Tobii Game Hub</b>: it is what moves the view directly in Elite. If it stays open, two sources drive the view and the image stutters.',
+  '<b>Fermer Tobii Game Hub</b> : c’est lui qui fait bouger la vue directement dans Elite. S’il reste ouvert, deux sources pilotent la vue et l’image saccade.': '<b>Close Tobii Game Hub</b>: it is what moves the view directly in Elite. If it stays open, two sources drive the view and the image stutters.',
   'Aucun autre head tracking ne doit être actif (Tobii Game Hub et logiciel TrackIR fermés).': 'No other head tracking must be active (Tobii Game Hub and TrackIR software closed).',
   // Profils & préréglages
-  'Profils': 'Profiles', 'Enregistre tes réglages sous un nom (combat, exploration, minage…). Les axes, le boost et la touche pause ne changent pas en chargeant un profil.':
+  'Profils': 'Profiles', 'Enregistrer les réglages sous un nom (combat, exploration, minage…). Les axes, le boost et la touche pause ne changent pas en chargeant un profil.':
     'Save your settings under a name (combat, exploration, mining…). Axes, boost and pause key are not changed when loading a profile.',
   '— aucun profil enregistré —': '— no saved profile —', 'Charger': 'Load', 'Supprimer': 'Delete', 'Nom du profil': 'Profile name', 'Enregistrer': 'Save',
   'Supprimer le profil « {n} » ?': 'Delete profile “{n}”?', 'Remplacer le profil « {n} » ?': 'Replace profile “{n}”?',
-  'Profil actif : ': 'Active profile: ', ' (modifié — enregistre pour garder les changements)': ' (modified — save to keep the changes)', 'Aucun profil chargé.': 'No profile loaded.',
+  'Profil actif : ': 'Active profile: ', ' (modifié — enregistrer pour garder les changements)': ' (modified — save to keep the changes)', 'Aucun profil chargé.': 'No profile loaded.',
   'Profil enregistré ✓': 'Profile saved ✓', 'Profil chargé ✓': 'Profile loaded ✓', 'Profil supprimé': 'Profile deleted', 'Erreur': 'Error',
   'nom de profil vide': 'empty profile name', 'profil introuvable': 'profile not found', 'action inconnue': 'unknown action',
-  'Préréglages': 'Presets', 'Force des mouvements et des secousses. Tes axes, ton boost et tes inversions sont conservés.': 'Strength of motion and shakes. Your axes, boost and inversions are kept.',
+  'Préréglages': 'Presets', 'Force des mouvements et des secousses. Les axes, le boost et les inversions sont conservés.': 'Strength of motion and shakes. Your axes, boost and inversions are kept.',
   'Faible': 'Low', 'Standard': 'Standard', 'Renforcé': 'Strong',
   'Tout en douceur, secousses à peine perceptibles.': 'Very gentle, barely noticeable shakes.', 'Discret et réaliste, secousses légères.': 'Subtle and realistic, light shakes.',
   'Bien perceptible, sans gêner la visée.': 'Clearly noticeable, without spoiling your aim.', 'Réglage actuel : personnalisé.': 'Current setting: custom.',
   // Sections
-  'Ressenti général': 'General feel', 'Comment ta tête (et ton cou) réagit.': 'How your head (and neck) reacts.',
+  'Ressenti général': 'General feel', 'Réaction de la tête et du cou.': 'How your head (and neck) reacts.',
   'Mouvements de pilotage': 'Flight motion', 'Coupe inertie et regard dans le virage (les secousses restent).': 'Turns off inertia and look-into-turn (shakes remain).',
   'Raideur du cou': 'Neck stiffness', 'Plus haut = la tête réagit plus vite.': 'Higher = the head reacts faster.', 'Amortissement': 'Damping', 'Plus haut = moins de rebond.': 'Higher = less bounce.',
   'Inertie': 'Inertia', 'La tête part à l’opposé quand le vaisseau commence à tourner.': 'The head moves the opposite way when the ship starts turning.',
@@ -326,14 +326,14 @@ const EN = {
   'Fréquence (Hz)': 'Frequency (Hz)', 'Bas = roulis lourd, haut = vibration sèche.': 'Low = heavy rolling, high = sharp vibration.',
   'Retour au calme': 'Settle speed', 'Plus haut = les chocs s’estompent vite.': 'Higher = impacts fade quickly.',
   'Grondement moteur': 'Engine rumble', 'Selon la position de la manette des gaz.': 'Follows the throttle position.',
-  'Gaz avec zéro au centre': 'Centre-zero throttle', 'Coche si ta manette a un cran central (marche arrière).': 'Tick if your throttle has a centre detent (reverse).',
+  'Gaz avec zéro au centre': 'Centre-zero throttle', 'À cocher si la manette des gaz a un cran central (marche arrière).': 'Tick if your throttle has a centre detent (reverse).',
   'Secousse au boost': 'Boost shake', 'Poussée au boost': 'Boost push', 'Signe = sens du recul de la tête.': 'Sign = direction the head is pushed.',
   'Secousses — événements': 'Shakes — events', 'Choc ponctuel quand l’événement arrive (0 = désactivé).': 'One-off impact when the event happens (0 = off).',
   'Secousses — états continus': 'Shakes — continuous states', 'Vibration permanente tant que l’état dure (0 = désactivé).': 'Continuous vibration while the state lasts (0 = off).',
   'Réponse du vaisseau': 'Ship response', 'Simulation de la rotation du vaisseau à partir du manche.': 'Simulated ship rotation from the stick.',
   'Temps de réponse (s)': 'Response time (s)', 'Délai entre le manche et la rotation.': 'Delay between stick and rotation.',
   'Tangage max (°/s)': 'Max pitch (°/s)', 'Lacet max (°/s)': 'Max yaw (°/s)', 'Roulis max (°/s)': 'Max roll (°/s)', 'Zone morte du manche': 'Stick deadzone',
-  'Axes HOTAS': 'HOTAS axes', 'Clique « Détecter » puis bouge franchement l’axe. Latéral et vertical = axes des propulseurs (-1 = non utilisé).':
+  'Axes HOTAS': 'HOTAS axes', 'Cliquer sur « Détecter » puis bouger franchement l’axe. Latéral et vertical = axes des propulseurs (-1 = non utilisé).':
     'Click “Detect” then move the axis firmly. Lateral and vertical = thruster axes (-1 = unused).',
   'Inverser un mouvement': 'Invert a motion', 'Si un mouvement part dans le mauvais sens.': 'If a motion goes the wrong way.',
   // Événements et états
@@ -344,9 +344,9 @@ const EN = {
   'Charge du FSD': 'FSD charging', 'Tunnel d’hyperespace': 'Hyperspace tunnel', 'Supercroisière': 'Supercruise', 'Surchauffe': 'Overheating',
   'Interdiction en cours': 'Being interdicted', 'En danger': 'In danger',
   // Commandes
-  'Détecter': 'Detect', 'Appuie…': 'Press…', 'Bouge l’axe…': 'Move the axis…', 'Effacer': 'Clear', 'inverser': 'invert', '(absent)': '(missing)',
+  'Détecter': 'Detect', 'Appuyer…': 'Press…', 'Bouger l’axe…': 'Move the axis…', 'Effacer': 'Clear', 'inverser': 'invert', '(absent)': '(missing)',
   'Aucun périphérique détecté par le script.': 'No device detected by the mod.',
-  'Bouton de manette, chapeau (POV) ou touche clavier/souris. Boost : Tab par défaut dans Elite. Pause : touche Pause/Attn par défaut, un appui coupe ou reprend tous les effets. Le point s’allume en vert quand tu appuies.':
+  'Bouton de manette, chapeau (POV) ou touche clavier/souris. Boost : Tab par défaut dans Elite. Pause : touche Pause/Attn par défaut, un appui coupe ou reprend tous les effets. Le point s’allume en vert lors de l’appui.':
     'Controller button, hat (POV) or keyboard/mouse key. Boost: Tab by default in Elite. Pause: Pause/Break key by default, one press turns all effects off or on. The dot lights green when you press.',
   'Clavier : ': 'Keyboard: ', 'Chapeau': 'Hat', 'Bouton': 'Button', 'Aucun': 'None', 'périph. ': 'device ', 'Pavé ': 'Numpad ', 'touche ': 'key ',
   'Clic milieu': 'Middle click', 'Souris 4': 'Mouse 4', 'Souris 5': 'Mouse 5', 'Retour arrière': 'Backspace', 'Entrée': 'Enter', 'Maj': 'Shift',
@@ -354,16 +354,16 @@ const EN = {
   'Ctrl droit': 'Right Ctrl', 'Alt gauche': 'Left Alt', 'Alt droit': 'Right Alt',
   // Onglets & bruitages
   'Caméra': 'Camera', 'Bruitages': 'Sound effects',
-  'Sons d’ambiance ajoutés à ceux du jeu. Ils suivent l’état de ton vaisseau (à bord, à quai, appontage, danger).': 'Ambient sounds added on top of the game’s. They follow your ship’s state (aboard, docked, docking, danger).',
+  'Sons d’ambiance ajoutés à ceux du jeu. Ils suivent l’état du vaisseau (à bord, à quai, appontage, danger).': 'Ambient sounds added on top of the game’s. They follow your ship’s state (aboard, docked, docking, danger).',
   'Bruitages activés': 'Sound effects enabled', 'Volume général': 'Master volume', 'Activé': 'Enabled', 'Volume': 'Volume',
   '▶ Écouter': '▶ Listen', '● en cours': '● playing',
   'Ambiance cockpit': 'Cockpit ambience',
-  'Tes fichiers du dossier sons/ambiance, joués au hasard l’un après l’autre quand tu es à bord. Dossier vide : ambiance synthétisée (support vie, ventilation, relais, servos).':
+  'Les fichiers du dossier sons/ambiance, joués au hasard l’un après l’autre à bord. Dossier vide : ambiance synthétisée (support vie, ventilation, relais, servos).':
     'Your files from the sons/ambiance folder, played at random one after another while aboard. Empty folder: synthesised ambience (life support, ventilation, relays, servos).',
   'Pause entre deux sons (s)': 'Pause between sounds (s)', 'Silence moyen entre la fin d’un fichier et le suivant.': 'Average silence between the end of one file and the next.',
   'Garder l’ambiance synthétisée en fond': 'Keep the synthesised ambience underneath',
-  'Volume de l’ambiance synthétisée en fond': 'Background synthesised ambience volume', 'Indépendant du volume de tes fichiers.': 'Independent from your files’ volume.', 'Ajoute le ronronnement synthétisé sous tes fichiers.': 'Adds the synthesised hum under your files.',
-  'Dépose tes fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/ambiance, à côté du mod. Ils sont lus en flux : les longues ambiances ne posent pas de problème.':
+  'Volume de l’ambiance synthétisée en fond': 'Background synthesised ambience volume', 'Indépendant du volume des fichiers.': 'Independent from your files’ volume.', 'Ajoute le ronronnement synthétisé sous les fichiers.': 'Adds the synthesised hum under your files.',
+  'Déposer les fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/ambiance, à côté du mod. Ils sont lus en flux : les longues ambiances ne posent pas de problème.':
     'Drop .wav, .ogg, .mp3 or .flac files into the sons/ambiance folder next to the mod. They are streamed, so long ambience tracks are fine.',
   'Fichiers trouvés dans sons/ambiance : {n}': 'Files found in sons/ambiance: {n}', ' — en cours : ': ' — playing: ',
   'Alertes de fond': 'Background alerts', 'Bips de console et carillons lointains ; alerte sourde en cas de danger, surchauffe, carburant bas ou interdiction.': 'Distant console beeps and chimes; muffled alarm on danger, overheating, low fuel or interdiction.',
@@ -371,12 +371,12 @@ const EN = {
   'Radio du contrôle': 'Control radio', 'Échanges radio étouffés sur la fréquence de la station : de la demande d’appontage jusqu’à l’arrêt des moteurs sur le pad, puis du décollage jusqu’à la sortie de la station.': 'Muffled radio exchanges on the station frequency: from the docking request until the engines shut down on the pad, then from take-off until you leave the station.',
   'Étouffement': 'Muffling', 'Plus haut = radio plus lointaine et plus sourde.': 'Higher = more distant, duller radio.',
   'Densité des échanges': 'Chatter density', 'Plus haut = transmissions plus rapprochées.': 'Higher = more frequent transmissions.',
-  'Dépose des fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/radio, à côté du mod : des extraits de 3 à 8 s sont pris au hasard et passent dans le filtre radio. Sans fichier, la radio reste muette. Utilise uniquement des enregistrements que tu as le droit d’utiliser.':
+  'Déposer des fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/radio, à côté du mod : des extraits de 3 à 8 s sont pris au hasard et passent dans le filtre radio. Sans fichier, la radio reste muette. Utiliser uniquement des enregistrements dont l’usage est autorisé.':
     'Drop .wav, .ogg, .mp3 or .flac files into the sons/radio folder next to the mod: random 3–8 s excerpts go through the radio filter. With no files, the radio stays silent. Only use recordings you have the right to use.',
   ' — radio muette tant que le dossier est vide.': ' — radio silent while the folder is empty.',
-  'Extraits de tes enregistrements du dossier sons/radio, étouffés comme sur la fréquence de la station : en fond tout le temps où tu es près d’une station ou d’une installation (arrivée, appontage, décollage, sortie), coupés moteurs arrêtés sur le pad. Courtes transmissions quand un autre vaisseau t’envoie un message.':
+  'Extraits des enregistrements du dossier sons/radio, étouffés comme sur la fréquence de la station : en fond tant que le vaisseau est près d’une station ou d’une installation (arrivée, appontage, décollage, sortie), coupés moteurs arrêtés sur le pad. Courtes transmissions quand un autre vaisseau envoie un message.':
     'Excerpts of your recordings from the sons/radio folder, muffled like the station frequency: in the background the whole time you are near a station or settlement (arrival, docking, take-off, exit), cut when the engines shut down on the pad. Short transmissions when another ship messages you.',
-  'Ambiance hangar': 'Hangar ambience', 'Machinerie, chocs métalliques lointains et annonces réverbérées quand tu es à quai.': 'Machinery, distant metal clanks and echoing announcements while docked.',
+  'Ambiance hangar': 'Hangar ambience', 'Machinerie, chocs métalliques lointains et annonces réverbérées à quai.': 'Machinery, distant metal clanks and echoing announcements while docked.',
   'Audio indisponible : ': 'Audio unavailable: ', 'Préparation des sons…': 'Preparing sounds…', 'En cours : ': 'Playing: ',
   'Prêt. Aucun son en cours (hors du vaisseau ou dans les menus).': 'Ready. Nothing playing (out of the ship or in menus).',
   'Enregistrements trouvés dans sons/radio : {n}': 'Recordings found in sons/radio: {n}',
@@ -449,12 +449,12 @@ async function profileAction(action, name) {
 function renderProfileState() {
   const p = $('#profileState'); if (!p) return;
   p.innerHTML = '';
-  if (cfg.profile) p.append(t('Profil actif : '), el('b', {}, cfg.profile), profileDirty ? t(' (modifié — enregistre pour garder les changements)') : '');
+  if (cfg.profile) p.append(t('Profil actif : '), el('b', {}, cfg.profile), profileDirty ? t(' (modifié — enregistrer pour garder les changements)') : '');
   else p.append(t('Aucun profil chargé.'));
 }
 function profilesCard() {
   const card = el('div', { class: 'card' }, el('h2', {}, t('Profils')),
-    el('p', { class: 'intro' }, t('Enregistre tes réglages sous un nom (combat, exploration, minage…). Les axes, le boost et la touche pause ne changent pas en chargeant un profil.')));
+    el('p', { class: 'intro' }, t('Enregistrer les réglages sous un nom (combat, exploration, minage…). Les axes, le boost et la touche pause ne changent pas en chargeant un profil.')));
   const sel = el('select');
   if (!profileNames.length) sel.append(el('option', { value: '' }, t('— aucun profil enregistré —')));
   for (const n of profileNames) sel.append(el('option', { value: n }, n));
@@ -484,48 +484,48 @@ const MODES = {
     desc: 'Aucun matériel : la vue part du centre et le mod y ajoute ses effets.',
     native: 'Aucun autre head tracking ne doit être actif (Tobii Game Hub et logiciel TrackIR fermés).',
     steps: [
-      'OpenTrack doit être <b>installé</b>, mais <b>pas lancé</b> (s’il tourne, ferme-le).',
-      'Aucun autre head tracking ne doit être actif : si tu as un Tobii, ferme <b>Tobii Game Hub</b> ; si tu as un TrackIR, ferme le logiciel TrackIR.',
-      'Lance le mod, <b>puis</b> Elite. Le bandeau « Effets actifs dans le jeu » doit passer au vert.',
+      'OpenTrack doit être <b>installé</b>, mais <b>pas lancé</b> (s’il tourne, le fermer).',
+      'Aucun autre head tracking ne doit être actif : avec un Tobii, fermer <b>Tobii Game Hub</b> ; avec un TrackIR, fermer le logiciel TrackIR.',
+      'Lancer le mod, <b>puis</b> Elite. Le bandeau « Effets actifs dans le jeu » doit passer au vert.',
     ],
   },
   tobii: {
     label: 'Tobii Eye Tracker (via OpenTrack)', name: 'Tobii',
-    desc: 'Ton Tobii pilote la vue, le mod y ajoute ses effets.',
+    desc: 'Le Tobii pilote la vue, le mod y ajoute ses effets.',
     native: 'Tobii Game Hub doit rester fermé (Tobii Experience reste ouvert) : le mod ne peut pas le vérifier.',
     steps: [
       '<b>Tobii Experience</b> doit rester ouvert (il fait fonctionner le Tobii), Tobii calibré.',
-      '<b>Ferme Tobii Game Hub</b> : c’est lui qui fait bouger la vue directement dans Elite. S’il reste ouvert, deux sources pilotent la vue et l’image saccade.',
+      '<b>Fermer Tobii Game Hub</b> : c’est lui qui fait bouger la vue directement dans Elite. S’il reste ouvert, deux sources pilotent la vue et l’image saccade.',
       'Dans OpenTrack : entrée <code>Tobii Eye Tracker</code> ; sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.',
-      'Clique sur <b>Start</b> dans OpenTrack.',
-      'Lance le mod, <b>puis</b> Elite. L’indicateur « Tobii ✓ » doit s’allumer.',
+      'Cliquer sur <b>Start</b> dans OpenTrack.',
+      'Lancer le mod, <b>puis</b> Elite. L’indicateur « Tobii ✓ » doit s’allumer.',
     ],
-    note: 'Ne choisis pas la sortie « freetrack » dans OpenTrack : elle entrerait en conflit avec le mod.',
+    note: 'Ne pas choisir la sortie « freetrack » dans OpenTrack : elle entrerait en conflit avec le mod.',
   },
   trackir: {
     label: 'TrackIR (via OpenTrack)', name: 'TrackIR',
-    desc: 'Ton TrackIR pilote la vue, le mod y ajoute ses effets.',
+    desc: 'Le TrackIR pilote la vue, le mod y ajoute ses effets.',
     native: 'Le logiciel TrackIR de NaturalPoint doit rester fermé.',
     steps: [
-      '<b>Ferme le logiciel TrackIR</b> de NaturalPoint : il enverrait sa propre position au jeu, en conflit avec le mod.',
-      'Dans OpenTrack : choisis l’entrée compatible avec ta caméra TrackIR (selon ta version d’OpenTrack) ; sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.',
-      'Clique sur <b>Start</b> dans OpenTrack.',
-      'Lance le mod, <b>puis</b> Elite. L’indicateur « TrackIR ✓ » doit s’allumer.',
+      '<b>Fermer le logiciel TrackIR</b> de NaturalPoint : il enverrait sa propre position au jeu, en conflit avec le mod.',
+      'Dans OpenTrack : choisir l’entrée compatible avec la caméra TrackIR (selon la version d’OpenTrack) ; sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.',
+      'Cliquer sur <b>Start</b> dans OpenTrack.',
+      'Lancer le mod, <b>puis</b> Elite. L’indicateur « TrackIR ✓ » doit s’allumer.',
     ],
-    note: 'Si ta version d’OpenTrack ne reconnaît pas ta caméra TrackIR, ce mode ne peut pas l’utiliser : le logiciel NaturalPoint ne peut pas tourner en même temps que le mod.',
+    note: 'Si la version d’OpenTrack installée ne reconnaît pas la caméra TrackIR, ce mode ne peut pas l’utiliser : le logiciel NaturalPoint ne peut pas tourner en même temps que le mod.',
   },
   other: {
     label: 'Autre tracker : webcam, smartphone… (via OpenTrack)', name: 'Head tracker',
     desc: 'N’importe quel tracker reconnu par OpenTrack pilote la vue, le mod y ajoute ses effets.',
     native: 'Aucun autre head tracking ne doit être actif (Tobii Game Hub et logiciel TrackIR fermés).',
     steps: [
-      'Dans OpenTrack : choisis l’entrée de ton tracker (par exemple <code>neuralnet tracker</code> pour une webcam).',
+      'Dans OpenTrack : choisir l’entrée du tracker (par exemple <code>neuralnet tracker</code> pour une webcam).',
       'Sortie <code>UDP over network</code>, adresse <code>127.0.0.1</code>, port <code>{port}</code>.',
-      'Clique sur <b>Start</b> dans OpenTrack.',
+      'Cliquer sur <b>Start</b> dans OpenTrack.',
       'Aucun autre head tracking ne doit être actif (Tobii Game Hub et logiciel TrackIR fermés).',
-      'Lance le mod, <b>puis</b> Elite. L’indicateur « Head tracker ✓ » doit s’allumer.',
+      'Lancer le mod, <b>puis</b> Elite. L’indicateur « Head tracker ✓ » doit s’allumer.',
     ],
-    note: 'Si ton tracker envoie lui-même en UDP vers OpenTrack, utilise un autre port que {port} pour cette entrée.',
+    note: 'Si le tracker envoie lui-même en UDP vers OpenTrack, utiliser un autre port que {port} pour cette entrée.',
   },
 };
 let helpOpen = false;
@@ -534,7 +534,7 @@ function trackerCheck() {
   const mode = MODES[live.tracker_mode] ? live.tracker_mode : 'none';
   const name = t(MODES[mode].name), port = cfg ? cfg.tracker_in_port : 5555;
   if (mode === 'none') return ['ok', 'Head tracking', t('Non utilisé : vue fixe + effets du mod.')];
-  if (live.tracker_error) return ['bad', name, trServer(live.tracker_error) + t(' (change le port dans Mode d’utilisation).')];
+  if (live.tracker_error) return ['bad', name, trServer(live.tracker_error) + t(' (changer le port dans Mode d’utilisation).')];
   return live.head_ok ? ['ok', name, t('Position de tête reçue d’OpenTrack.')]
                       : ['warn', name, t('Rien reçu : OpenTrack lancé (Start), sortie UDP 127.0.0.1:{port} ?').replace('{port}', port)];
 }
@@ -554,7 +554,7 @@ function renderHelp(box) {
 function modeCard() {
   const mode = MODES[cfg.tracker_mode] ? cfg.tracker_mode : 'none';
   const card = el('div', { class: 'card' }, el('h2', {}, t('Mode d’utilisation')),
-    el('p', { class: 'intro' }, t('Choisis si tu joues avec un head tracker ou non. Le changement s’applique tout de suite.')));
+    el('p', { class: 'intro' }, t('Choisir de jouer avec ou sans head tracker. Le changement s’applique immédiatement.')));
   const sel = el('select');
   for (const [k, m] of Object.entries(MODES)) sel.append(el('option', { value: k }, t(m.label)));
   sel.value = mode;
@@ -574,7 +574,7 @@ function modeCard() {
 
 function presetsCard() {
   const card = el('div', { class: 'card' }, el('h2', {}, t('Préréglages')),
-    el('p', { class: 'intro' }, t('Force des mouvements et des secousses. Tes axes, ton boost et tes inversions sont conservés.')));
+    el('p', { class: 'intro' }, t('Force des mouvements et des secousses. Les axes, le boost et les inversions sont conservés.')));
   const g = el('div', { class: 'presets' });
   for (const [name, p] of Object.entries(PRESETS)) {
     const btn = el('button', { class: 'preset' + (cfg.preset === name ? ' active' : '') }, el('b', {}, t(name)), el('small', {}, t(p.desc)));
@@ -600,7 +600,7 @@ const STATE_LABELS = {
 };
 
 const SECTIONS = [
-  { title: 'Ressenti général', intro: 'Comment ta tête (et ton cou) réagit.', rows: [
+  { title: 'Ressenti général', intro: 'Réaction de la tête et du cou.', rows: [
     ['toggle', 'effects_enabled', 'Mouvements de pilotage', 'Coupe inertie et regard dans le virage (les secousses restent).'],
     ['slider', 'spring.stiffness', 'Raideur du cou', 5, 150, 1, 'Plus haut = la tête réagit plus vite.'],
     ['slider', 'spring.damping', 'Amortissement', 1, 40, 0.5, 'Plus haut = moins de rebond.'],
@@ -654,7 +654,7 @@ const SECTIONS = [
     ['slider', 'shake.frequency_hz', 'Fréquence (Hz)', 2, 30, 0.5, 'Bas = roulis lourd, haut = vibration sèche.'],
     ['slider', 'shake.decay_per_s', 'Retour au calme', 0.2, 5, 0.1, 'Plus haut = les chocs s’estompent vite.'],
     ['slider', 'shake.engine_rumble', 'Grondement moteur', 0, 1, 0.01, 'Selon la position de la manette des gaz.'],
-    ['toggle', 'shake.throttle_centered', 'Gaz avec zéro au centre', 'Coche si ta manette a un cran central (marche arrière).'],
+    ['toggle', 'shake.throttle_centered', 'Gaz avec zéro au centre', 'À cocher si la manette des gaz a un cran central (marche arrière).'],
     ['slider', 'shake.boost', 'Secousse au boost', 0, 1, 0.01, ''],
     ['slider', 'shake.boost_kick', 'Poussée au boost', -150, 150, 5, 'Signe = sens du recul de la tête.'],
   ]},
@@ -667,7 +667,7 @@ const SECTIONS = [
     ['slider', 'max_rate.roll', 'Roulis max (°/s)', 0, 180, 1, ''],
     ['slider', 'deadzone', 'Zone morte du manche', 0, 0.3, 0.01, ''],
   ]},
-  { title: 'Axes HOTAS', intro: 'Clique « Détecter » puis bouge franchement l’axe. Latéral et vertical = axes des propulseurs (-1 = non utilisé).', custom: 'axes' },
+  { title: 'Axes HOTAS', intro: 'Cliquer sur « Détecter » puis bouger franchement l’axe. Latéral et vertical = axes des propulseurs (-1 = non utilisé).', custom: 'axes' },
   { title: 'Inverser un mouvement', intro: 'Si un mouvement part dans le mauvais sens.', custom: 'invert' },
 ];
 
@@ -738,13 +738,13 @@ function axesCard(card) {
   }
   card.append(bindRow('shake.boost_button', 'Boost'));
   card.append(bindRow('pause_key', 'Pause'));
-  card.append(el('p', { class: 'hint' }, t('Bouton de manette, chapeau (POV) ou touche clavier/souris. Boost : Tab par défaut dans Elite. Pause : touche Pause/Attn par défaut, un appui coupe ou reprend tous les effets. Le point s’allume en vert quand tu appuies.')));
+  card.append(el('p', { class: 'hint' }, t('Bouton de manette, chapeau (POV) ou touche clavier/souris. Boost : Tab par défaut dans Elite. Pause : touche Pause/Attn par défaut, un appui coupe ou reprend tous les effets. Le point s’allume en vert lors de l’appui.')));
 }
 
 // Ligne d'assignation générique : libellé, touche actuelle, témoin, Effacer, Détecter
 function bindRow(path, label) {
   const btn = el('button', { class: 'small' }, t('Détecter'));
-  if (bindDetect && bindDetect.path === path) { btn.classList.add('detecting'); btn.textContent = t('Appuie…'); }
+  if (bindDetect && bindDetect.path === path) { btn.classList.add('detecting'); btn.textContent = t('Appuyer…'); }
   btn.addEventListener('click', async () => {
     try {
       const r = await fetch('/api/detect', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ target: path }) });
@@ -790,7 +790,7 @@ function startDetect(kind, spec, btn) {
   if (!live || !live.joysticks || !live.joysticks.length) { alert(t('Aucun périphérique détecté par le script.')); detect = null; return; }
   detect = { kind, spec, btn, base: JSON.parse(JSON.stringify(live.joysticks)), until: Date.now() + 10000 };
   btn.classList.add('detecting');
-  btn.textContent = t(kind === 'axis' ? 'Bouge l’axe…' : 'Appuie…');
+  btn.textContent = t(kind === 'axis' ? 'Bouger l’axe…' : 'Appuyer…');
 }
 function checkDetect() {
   if (!detect || !live) return;
@@ -832,25 +832,25 @@ function tabsBar() {
 
 const SOUND_CATS = [
   { key: 'cockpit', title: 'Ambiance cockpit',
-    desc: 'Tes fichiers du dossier sons/ambiance, joués au hasard l’un après l’autre quand tu es à bord. Dossier vide : ambiance synthétisée (support vie, ventilation, relais, servos).',
+    desc: 'Les fichiers du dossier sons/ambiance, joués au hasard l’un après l’autre à bord. Dossier vide : ambiance synthétisée (support vie, ventilation, relais, servos).',
     extra: [['slider', 'sound.cockpit.gap_s', 'Pause entre deux sons (s)', 0, 30, 0.5, 'Silence moyen entre la fin d’un fichier et le suivant.'],
-            ['toggle', 'sound.cockpit.keep_synth', 'Garder l’ambiance synthétisée en fond', 'Ajoute le ronronnement synthétisé sous tes fichiers.'],
-            ['slider', 'sound.cockpit.synth_volume', 'Volume de l’ambiance synthétisée en fond', 0, 1, 0.05, 'Indépendant du volume de tes fichiers.']] },
+            ['toggle', 'sound.cockpit.keep_synth', 'Garder l’ambiance synthétisée en fond', 'Ajoute le ronronnement synthétisé sous les fichiers.'],
+            ['slider', 'sound.cockpit.synth_volume', 'Volume de l’ambiance synthétisée en fond', 0, 1, 0.05, 'Indépendant du volume des fichiers.']] },
   { key: 'alerts', title: 'Alertes de fond',
     desc: 'Bips de console et carillons lointains ; alerte sourde en cas de danger, surchauffe, carburant bas ou interdiction.',
     extra: [['slider', 'sound.alerts.interval_s', 'Intervalle moyen (s)', 5, 60, 1, 'Temps moyen entre deux bips de console.']] },
   { key: 'radio', title: 'Radio du contrôle',
-    desc: 'Extraits de tes enregistrements du dossier sons/radio, étouffés comme sur la fréquence de la station : en fond tout le temps où tu es près d’une station ou d’une installation (arrivée, appontage, décollage, sortie), coupés moteurs arrêtés sur le pad. Courtes transmissions quand un autre vaisseau t’envoie un message.',
+    desc: 'Extraits des enregistrements du dossier sons/radio, étouffés comme sur la fréquence de la station : en fond tant que le vaisseau est près d’une station ou d’une installation (arrivée, appontage, décollage, sortie), coupés moteurs arrêtés sur le pad. Courtes transmissions quand un autre vaisseau envoie un message.',
     extra: [['slider', 'sound.radio.muffle', 'Étouffement', 0, 1, 0.05, 'Plus haut = radio plus lointaine et plus sourde.'],
             ['slider', 'sound.radio.chatter', 'Densité des échanges', 0, 1, 0.05, 'Plus haut = transmissions plus rapprochées.']] },
   { key: 'hangar', title: 'Ambiance hangar',
-    desc: 'Machinerie, chocs métalliques lointains et annonces réverbérées quand tu es à quai.' },
+    desc: 'Machinerie, chocs métalliques lointains et annonces réverbérées à quai.' },
 ];
 
 const REBUILD_ON = ['sound.cockpit.keep_synth'];
 function soundTab(root) {
   const main = el('div', { class: 'card' }, el('h2', {}, t('Bruitages')),
-    el('p', { class: 'intro' }, t('Sons d’ambiance ajoutés à ceux du jeu. Ils suivent l’état de ton vaisseau (à bord, à quai, appontage, danger).')));
+    el('p', { class: 'intro' }, t('Sons d’ambiance ajoutés à ceux du jeu. Ils suivent l’état du vaisseau (à bord, à quai, appontage, danger).')));
   main.append(toggleRow('sound.enabled', 'Bruitages activés', ''));
   main.append(sliderRow('sound.master', 'Volume général', 0, 1, 0.05, ''));
   main.append(el('p', { class: 'soundstatus', id: 'soundStatus' }, '…'));
@@ -869,11 +869,11 @@ function soundTab(root) {
     }
     if (c.key === 'cockpit') {
       card.append(el('p', { class: 'hint', id: 'ambFiles' }, ''));
-      card.append(el('p', { class: 'hint' }, t('Dépose tes fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/ambiance, à côté du mod. Ils sont lus en flux : les longues ambiances ne posent pas de problème.')));
+      card.append(el('p', { class: 'hint' }, t('Déposer les fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/ambiance, à côté du mod. Ils sont lus en flux : les longues ambiances ne posent pas de problème.')));
     }
     if (c.key === 'radio') {
       card.append(el('p', { class: 'hint', id: 'radioFiles' }, ''));
-      card.append(el('p', { class: 'hint' }, t('Dépose des fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/radio, à côté du mod : des extraits de 3 à 8 s sont pris au hasard et passent dans le filtre radio. Sans fichier, la radio reste muette. Utilise uniquement des enregistrements que tu as le droit d’utiliser.')));
+      card.append(el('p', { class: 'hint' }, t('Déposer des fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/radio, à côté du mod : des extraits de 3 à 8 s sont pris au hasard et passent dans le filtre radio. Sans fichier, la radio reste muette. Utiliser uniquement des enregistrements dont l’usage est autorisé.')));
     }
     root.append(card);
   }
@@ -933,13 +933,13 @@ function renderStatus() {
   const checks = [
     live.dry_run ? ['bad', 'Mode test', 'Le script ne tourne pas sous Windows : rien n’est envoyé au jeu.'] :
       live.game ? ['ok', 'Relié à Elite', t('{game} a chargé le TrackIR du mod.').replace('{game}', live.game)]
-                : ['bad', 'Pas relié au jeu', 'Lance Elite après le script (Elite détecte le TrackIR au démarrage).'],
+                : ['bad', 'Pas relié au jeu', 'Lancer Elite après le script (Elite détecte le TrackIR au démarrage).'],
     live.conflict ? ['bad', 'Conflit', 'Un autre programme envoie aussi la position de tête (OpenTrack en sortie freetrack ?).']
                   : ['ok', 'Aucun conflit', 'Le mod est le seul à piloter la vue.'],
     joys.length ? ['ok', 'HOTAS', joys.map((j, i) => `${i} : ${j.name}`).join(' · ')]
                 : ['bad', 'HOTAS', 'Aucun périphérique détecté.'],
     trackerCheck(),
-    !live.journal ? ['bad', 'Journal Elite', 'Introuvable : supercroisière non détectée (secousses non coupées) et pas de secousses sur événements. Renseigne journal_dir dans config.json.']
+    !live.journal ? ['bad', 'Journal Elite', 'Introuvable : supercroisière non détectée (secousses non coupées) et pas de secousses sur événements. Renseigner journal_dir dans config.json.']
       : live.in_ship ? ['ok', 'Dans le vaisseau', 'Les événements du jeu déclenchent les secousses.']
                      : ['warn', 'Hors du vaisseau', 'Pas aux commandes (menu, SRV ou chasseur ?).'],
     (live.effects_on || live.shake_on) ? ['ok', 'Effets', [live.effects_on && t('mouvements'), live.shake_on && t('secousses')].filter(Boolean).join(' + ') + t(' activés.')]
