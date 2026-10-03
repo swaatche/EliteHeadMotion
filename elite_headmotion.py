@@ -1,5 +1,5 @@
 """
-Elite Head Motion v0.1 - par swaatche
+Elite Head Motion - par swaatche
 Simule les mouvements de tête du pilote (regard dans les virages, accélérations, strafe)
 et des secousses (dégâts, sauts FSD, supercroisière, boost, moteur), puis les envoie
 directement à Elite comme un TrackIR.
@@ -30,6 +30,8 @@ import threading
 import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+VERSION = "0.1"  # version du mod : seul endroit à modifier (affichée dans la page de réglages)
 
 IS_WINDOWS = os.name == "nt"
 if IS_WINDOWS:
@@ -661,7 +663,7 @@ def make_handler(shared):
             if path in ("/", "/index.html", "/settings.html"):
                 try:
                     with open(HTML_PATH, encoding="utf-8") as f:
-                        self._send(200, f.read(), "text/html; charset=utf-8")
+                        self._send(200, f.read().replace("{{VERSION}}", VERSION), "text/html; charset=utf-8")
                 except OSError:
                     self._send(404, "settings.html introuvable à côté du script", "text/plain; charset=utf-8")
             elif path == "/api/config":

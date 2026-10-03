@@ -191,7 +191,7 @@
   </aside>
   <section id="settings"></section>
 </main>
-<footer data-i18n-html><b>Elite Head Motion</b> v0.1 — par swaatche · Mod non officiel, non affilié à Frontier Developments. Elite Dangerous est une marque et une propriété de Frontier Developments plc.</footer>
+<footer><b>Elite Head Motion</b> v{{VERSION}} — <span data-i18n-html>par swaatche · Mod non officiel, non affilié à Frontier Developments. Elite Dangerous est une marque et une propriété de Frontier Developments plc.</span></footer>
 
 <script>
 const $ = s => document.querySelector(s);
@@ -207,8 +207,8 @@ let lang = 'fr';
 try { lang = localStorage.getItem('hm_lang') || ''; } catch {}
 if (lang !== 'fr' && lang !== 'en') lang = (navigator.language || 'fr').toLowerCase().startsWith('fr') ? 'fr' : 'en';
 const EN = {
-  '<b>Elite Head Motion</b> v0.1 — par swaatche · Mod non officiel, non affilié à Frontier Developments. Elite Dangerous est une marque et une propriété de Frontier Developments plc.':
-    '<b>Elite Head Motion</b> v0.1 — by swaatche · Unofficial mod, not affiliated with Frontier Developments. Elite Dangerous is a trademark and property of Frontier Developments plc.',
+  'par swaatche · Mod non officiel, non affilié à Frontier Developments. Elite Dangerous est une marque et une propriété de Frontier Developments plc.':
+    'by swaatche · Unofficial mod, not affiliated with Frontier Developments. Elite Dangerous is a trademark and property of Frontier Developments plc.',
   // En-tête, état, direct
   'Jeu': 'Game', 'Quitter': 'Quit', 'Arrête le mod et remet la vue au centre': 'Stops the mod and recentres the view',
   'Quitter le mod ? Les effets et les bruitages s’arrêtent.': 'Quit the mod? Effects and sounds will stop.', 'Mod arrêté': 'Mod stopped',
