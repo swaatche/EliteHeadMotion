@@ -4,4 +4,14 @@ dist/
 EliteHeadMotion/
 *.spec
 config.json
+profiles.json
 .DS_Store
+
+# Outil de compilation local
+build_exe.bat
+
+# Fichiers audio personnels (seuls les README des dossiers sons/ sont versionnés)
+sons/**/*.wav
+sons/**/*.ogg
+sons/**/*.mp3
+sons/**/*.flac
