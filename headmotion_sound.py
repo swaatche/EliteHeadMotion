@@ -2,7 +2,8 @@
 Elite Head Motion : bruitages d'ambiance.
 
 Tous les sons sont synthétisés au démarrage (aucun fichier à fournir, aucun droit d'auteur) :
-  - ambiance cockpit : fichiers du dossier « sons/ambiance » joués au hasard, l'un après l'autre
+  - ambiance cockpit : fichiers du dossier « sons/ambiance » joués au hasard, l'un après l'autre ;
+    « sons/ambiance/boucles » superposées en continu ; « sons/ambiance/ponctuels » joués au hasard par-dessus
     (dossier vide : ronronnement du support vie, ventilation, relais et servos synthétisés) ;
   - alertes de fond : bips de console lointains, carillons, alerte sourde en cas de danger ;
   - radio du contrôle : extraits de TES enregistrements (dossier « sons/radio »), étouffés par un
@@ -32,6 +33,7 @@ import pygame
 
 CATEGORIES = ("cockpit", "alerts", "radio", "hangar")
 AUDIO_EXT = (".wav", ".ogg", ".mp3", ".flac")
+LAYER_BASE, MAX_LAYERS = 4, 8   # canaux réservés aux boucles superposées de sons/ambiance/boucles
 
 # Bits du champ Flags de Status.json utilisés ici
 F_DOCKED, F_INSHIP = 0, 24
@@ -331,6 +333,15 @@ class SoundEngine:
         self.sounds_dir = sounds_dir
         self.radio_dir = os.path.join(sounds_dir, "radio")
         self.ambiance_dir = os.path.join(sounds_dir, "ambiance")
+        self.layer_dir = os.path.join(self.ambiance_dir, "boucles")
+        self.spot_dir = os.path.join(self.ambiance_dir, "ponctuels")
+        self.layer_files, self.spot_files = [], []
+        self.layer_snd, self.spot_snd = {}, {}   # fichiers chargés en mémoire (thread)
+        self.layers = {}                         # boucle en cours -> canal, gain, cible, pan
+        self.loading = False
+        self.spot_last = None
+        self.spot_time = 0.0
+        self.next_spot = time.monotonic() + 5
         self.amb_files, self.amb_bad = [], set()
         self.radio_bad = set()
         self.amb_scan = 0.0
@@ -367,15 +378,16 @@ class SoundEngine:
                 pygame.mixer.init()
             sr, _size, channels = pygame.mixer.get_init()
             self.sr, self.channels = sr, channels
-            pygame.mixer.set_num_channels(16)
-            pygame.mixer.set_reserved(4)
+            pygame.mixer.set_num_channels(24)
+            pygame.mixer.set_reserved(LAYER_BASE + MAX_LAYERS)
             self.ok = True
         except pygame.error as e:
             self.error = f"audio indisponible : {e}"
             return
         try:
             os.makedirs(self.radio_dir, exist_ok=True)
-            os.makedirs(self.ambiance_dir, exist_ok=True)
+            os.makedirs(self.layer_dir, exist_ok=True)
+            os.makedirs(self.spot_dir, exist_ok=True)
         except OSError:
             pass
         self.synth = Synth(self.sr)
@@ -532,10 +544,21 @@ class SoundEngine:
             if cat == "cockpit":
                 self.amb_next = now
                 self.next_mech = now + 1.5
+                self.next_spot = now + 2.0  # un son ponctuel pendant l'écoute
 
     # --- boucle ---------------------------------------------------------------
+    @staticmethod
+    def _free_channel():
+        """Canal libre hors des canaux réservés (pygame peut renvoyer un canal réservé,
+        qui serait aussitôt coupé par la gestion des boucles)."""
+        for i in range(LAYER_BASE + MAX_LAYERS, pygame.mixer.get_num_channels()):
+            ch = pygame.mixer.Channel(i)
+            if not ch.get_busy():
+                return ch
+        return None
+
     def _play_oneshot(self, arr, vol, pan=None):
-        ch = pygame.mixer.find_channel(False)
+        ch = self._free_channel()
         if ch is None:
             return
         pan = self.synth.rng.uniform(-0.7, 0.7) if pan is None else pan
@@ -584,7 +607,13 @@ class SoundEngine:
         if now - self.amb_scan > 5.0:
             self.amb_scan = now
             self.amb_files = [p for p in self._scan(self.ambiance_dir) if p not in self.amb_bad]
-        use_files = bool(self.amb_files)
+            self.layer_files = [p for p in self._scan(self.layer_dir) if p not in self.amb_bad]
+            self.spot_files = [p for p in self._scan(self.spot_dir) if p not in self.amb_bad]
+            missing = [p for p in self.layer_files + self.spot_files if p not in self.layer_snd and p not in self.spot_snd]
+            if missing and not self.loading:
+                self.loading = True
+                threading.Thread(target=self._load_ambiance, daemon=True).start()
+        use_files = bool(self.amb_files or self.layer_files or self.spot_files)
         synth_on = not use_files or bool(cc.get("keep_synth", False))
         # Volume de l'ambiance synthétisée : le volume cockpit si elle est seule,
         # son propre volume quand elle reste en fond sous tes fichiers
@@ -594,7 +623,9 @@ class SoundEngine:
             synth_vol = vol("cockpit")
         cockpit_on = (in_ship or testing["cockpit"]) and vol("cockpit") > 0
         self._loop(self.CH_COCKPIT, "cockpit", synth_vol * 0.6 if cockpit_on and synth_on else 0.0, dt)
-        self._ambiance_files(cockpit_on and use_files, vol("cockpit"), float(cc.get("gap_s", 4.0)), now)
+        self._ambiance_files(cockpit_on and bool(self.amb_files), vol("cockpit"), float(cc.get("gap_s", 4.0)), now)
+        self._ambiance_layers(cockpit_on, vol("cockpit"), dt, now)
+        self._ambiance_spots(cockpit_on, vol("cockpit"), float(cc.get("spot_interval_s", 25.0)), now)
         if cockpit_on:
             active.append("cockpit")
             if synth_on and now >= self.next_mech:
@@ -696,11 +727,85 @@ class SoundEngine:
         elif self.amb_playing:
             music.set_volume(volume)
 
+    def _load_ambiance(self):
+        """Charge en mémoire les boucles et les sons ponctuels (thread : le décodage peut être lent)."""
+        try:
+            for files, dest in ((self.layer_files, self.layer_snd), (self.spot_files, self.spot_snd)):
+                for p in list(files):
+                    if p in dest or p in self.amb_bad:
+                        continue
+                    try:
+                        dest[p] = pygame.mixer.Sound(p)
+                    except pygame.error as e:
+                        self.amb_bad.add(p)
+                        self.error = f"ambiance : {os.path.basename(p)} illisible ({e})"
+        finally:
+            self.loading = False
+
+    def _ambiance_layers(self, on, volume, dt, now):
+        """Boucles de sons/ambiance/boucles jouées en même temps, chacune avec un volume qui
+        varie lentement et un placement gauche/droite fixe : l'ensemble ne sonne jamais pareil."""
+        rng = self.synth.rng
+        wanted = [p for p in self.layer_files if p in self.layer_snd][:MAX_LAYERS]
+        for p in list(self.layers):                      # fichier retiré du dossier
+            if p not in wanted:
+                pygame.mixer.Channel(self.layers.pop(p)["ch"]).fadeout(1500)
+        used = {st["ch"] for st in self.layers.values()}
+        free = [LAYER_BASE + i for i in range(MAX_LAYERS) if LAYER_BASE + i not in used]
+        for p in wanted:
+            if p not in self.layers and free:
+                self.layers[p] = {"ch": free.pop(0), "gain": 0.0, "target": rng.uniform(0.6, 1.0),
+                                  "next": now + rng.uniform(6, 18), "pan": rng.uniform(-0.45, 0.45),
+                                  "start": now + rng.uniform(0.0, 4.0)}  # départs décalés
+        for p, st in self.layers.items():
+            ch = pygame.mixer.Channel(st["ch"])
+            if on:
+                if now >= st["next"]:
+                    st["target"] = rng.uniform(0.55, 1.0)
+                    st["next"] = now + rng.uniform(6, 18)
+                target = st["target"] if now >= st["start"] else 0.0
+            else:
+                target = 0.0
+            st["gain"] += (target - st["gain"]) * min(1.0, dt / 3.0)
+            if target == 0.0 and st["gain"] < 0.002:
+                st["gain"] = 0.0
+            if st["gain"] > 0.0:
+                if not ch.get_busy():
+                    ch.play(self.layer_snd[p], loops=-1)
+                v = volume * st["gain"]
+                ch.set_volume(v * (1 - max(st["pan"], 0)), v * (1 + min(st["pan"], 0)))
+            elif ch.get_busy():
+                ch.stop()
+                st["start"] = now + rng.uniform(0.0, 4.0)
+
+    def _ambiance_spots(self, on, volume, interval, now):
+        """Sons courts de sons/ambiance/ponctuels, joués au hasard par-dessus l'ambiance."""
+        spots = [p for p in self.spot_files if p in self.spot_snd]
+        if not (on and spots):
+            self.next_spot = max(self.next_spot, now + 3.0)
+            return
+        if now < self.next_spot:
+            return
+        rng = self.synth.rng
+        p = random.choice([s for s in spots if s != self.spot_last] or spots)
+        ch = self._free_channel()
+        if ch is not None:
+            pan = rng.uniform(-0.7, 0.7)
+            v = volume * rng.uniform(0.7, 1.0)
+            ch.play(self.spot_snd[p])
+            ch.set_volume(v * (1 - max(pan, 0)), v * (1 + min(pan, 0)))
+            self.spot_last = p
+            self.spot_time = now
+        self.next_spot = now + max(2.0, interval) * rng.uniform(0.5, 1.5)
+
     def status(self):
         return {"ok": self.ok, "ready": self.ready, "error": self.error,
                 "files": len(self.files), "active": self.active,
                 "radio_dir": self.radio_dir,
                 "ambiance_files": len(self.amb_files),
+                "ambiance_layers": len(self.layer_files), "ambiance_spots": len(self.spot_files),
+                "spot_last": os.path.basename(self.spot_last) if self.spot_last else "",
+                "spot_ago": round(time.monotonic() - self.spot_time) if self.spot_last else None,
                 "ambiance_now": os.path.basename(self.amb_playing) if self.amb_playing else ""}
 
     def stop(self):

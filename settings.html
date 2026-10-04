@@ -358,13 +358,16 @@ const EN = {
   'Bruitages activés': 'Sound effects enabled', 'Volume général': 'Master volume', 'Activé': 'Enabled', 'Volume': 'Volume',
   '▶ Écouter': '▶ Listen', '● en cours': '● playing',
   'Ambiance cockpit': 'Cockpit ambience',
-  'Les fichiers du dossier sons/ambiance, joués au hasard l’un après l’autre à bord. Dossier vide : ambiance synthétisée (support vie, ventilation, relais, servos).':
-    'Your files from the sons/ambiance folder, played at random one after another while aboard. Empty folder: synthesised ambience (life support, ventilation, relays, servos).',
-  'Pause entre deux sons (s)': 'Pause between sounds (s)', 'Silence moyen entre la fin d’un fichier et le suivant.': 'Average silence between the end of one file and the next.',
+  'Sons d’ambiance à bord, en couches : boucles superposées (sons/ambiance/boucles), sons courts joués au hasard par-dessus (sons/ambiance/ponctuels) et longues pistes lues l’une après l’autre (sons/ambiance). Dossiers vides : ambiance synthétisée (support vie, ventilation, relais, servos).':
+    'Ambient sounds aboard, in layers: overlapping loops (sons/ambiance/boucles), short sounds played at random on top (sons/ambiance/ponctuels) and long tracks played one after another (sons/ambiance). Empty folders: synthesised ambience (life support, ventilation, relays, servos).',
+  'Pause entre deux pistes (s)': 'Pause between tracks (s)', 'Silence moyen entre deux longues pistes de sons/ambiance.': 'Average silence between two long tracks from sons/ambiance.',
+  'Intervalle des sons ponctuels (s)': 'One-shot sound interval (s)', 'Temps moyen entre deux sons de sons/ambiance/ponctuels.': 'Average time between two sounds from sons/ambiance/ponctuels.',
+  'Boucles : {l} · ponctuels : {s} · pistes : {n}': 'Loops: {l} · one-shots: {s} · tracks: {n}',
+  ' — dernier ponctuel : {f} (il y a {s} s)': ' — last one-shot: {f} ({s} s ago)',
   'Garder l’ambiance synthétisée en fond': 'Keep the synthesised ambience underneath',
   'Volume de l’ambiance synthétisée en fond': 'Background synthesised ambience volume', 'Indépendant du volume des fichiers.': 'Independent from your files’ volume.', 'Ajoute le ronronnement synthétisé sous les fichiers.': 'Adds the synthesised hum under your files.',
-  'Déposer les fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/ambiance, à côté du mod. Ils sont lus en flux : les longues ambiances ne posent pas de problème.':
-    'Drop .wav, .ogg, .mp3 or .flac files into the sons/ambiance folder next to the mod. They are streamed, so long ambience tracks are fine.',
+  'Formats .wav, .ogg, .mp3 ou .flac. sons/ambiance/boucles : sons qui bouclent proprement (tuyaux, pompe, ventilateur…), tous joués en même temps avec un volume qui varie lentement. sons/ambiance/ponctuels : sons de quelques secondes (valve, déclic…). sons/ambiance : longues pistes, lues en flux.':
+    'Formats .wav, .ogg, .mp3 or .flac. sons/ambiance/boucles: sounds that loop cleanly (pipes, pump, fan…), all played at once with a slowly varying volume. sons/ambiance/ponctuels: sounds a few seconds long (valve, click…). sons/ambiance: long tracks, streamed.',
   'Fichiers trouvés dans sons/ambiance : {n}': 'Files found in sons/ambiance: {n}', ' — en cours : ': ' — playing: ',
   'Alertes de fond': 'Background alerts', 'Bips de console et carillons lointains ; alerte sourde en cas de danger, surchauffe, carburant bas ou interdiction.': 'Distant console beeps and chimes; muffled alarm on danger, overheating, low fuel or interdiction.',
   'Intervalle moyen (s)': 'Average interval (s)', 'Temps moyen entre deux bips de console.': 'Average time between console beeps.',
@@ -832,8 +835,9 @@ function tabsBar() {
 
 const SOUND_CATS = [
   { key: 'cockpit', title: 'Ambiance cockpit',
-    desc: 'Les fichiers du dossier sons/ambiance, joués au hasard l’un après l’autre à bord. Dossier vide : ambiance synthétisée (support vie, ventilation, relais, servos).',
-    extra: [['slider', 'sound.cockpit.gap_s', 'Pause entre deux sons (s)', 0, 30, 0.5, 'Silence moyen entre la fin d’un fichier et le suivant.'],
+    desc: 'Sons d’ambiance à bord, en couches : boucles superposées (sons/ambiance/boucles), sons courts joués au hasard par-dessus (sons/ambiance/ponctuels) et longues pistes lues l’une après l’autre (sons/ambiance). Dossiers vides : ambiance synthétisée (support vie, ventilation, relais, servos).',
+    extra: [['slider', 'sound.cockpit.spot_interval_s', 'Intervalle des sons ponctuels (s)', 5, 120, 1, 'Temps moyen entre deux sons de sons/ambiance/ponctuels.'],
+            ['slider', 'sound.cockpit.gap_s', 'Pause entre deux pistes (s)', 0, 30, 0.5, 'Silence moyen entre deux longues pistes de sons/ambiance.'],
             ['toggle', 'sound.cockpit.keep_synth', 'Garder l’ambiance synthétisée en fond', 'Ajoute le ronronnement synthétisé sous les fichiers.'],
             ['slider', 'sound.cockpit.synth_volume', 'Volume de l’ambiance synthétisée en fond', 0, 1, 0.05, 'Indépendant du volume des fichiers.']] },
   { key: 'alerts', title: 'Alertes de fond',
@@ -869,7 +873,7 @@ function soundTab(root) {
     }
     if (c.key === 'cockpit') {
       card.append(el('p', { class: 'hint', id: 'ambFiles' }, ''));
-      card.append(el('p', { class: 'hint' }, t('Déposer les fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/ambiance, à côté du mod. Ils sont lus en flux : les longues ambiances ne posent pas de problème.')));
+      card.append(el('p', { class: 'hint' }, t('Formats .wav, .ogg, .mp3 ou .flac. sons/ambiance/boucles : sons qui bouclent proprement (tuyaux, pompe, ventilateur…), tous joués en même temps avec un volume qui varie lentement. sons/ambiance/ponctuels : sons de quelques secondes (valve, déclic…). sons/ambiance : longues pistes, lues en flux.')));
     }
     if (c.key === 'radio') {
       card.append(el('p', { class: 'hint', id: 'radioFiles' }, ''));
@@ -891,8 +895,9 @@ function renderSound() {
   }
   document.querySelectorAll('[data-sound-cat]').forEach(e => e.classList.toggle('on', !!(s.active || []).includes(e.dataset.soundCat)));
   const af = $('#ambFiles');
-  if (af) af.textContent = t('Fichiers trouvés dans sons/ambiance : {n}').replace('{n}', s.ambiance_files || 0)
+  if (af) af.textContent = t('Boucles : {l} · ponctuels : {s} · pistes : {n}').replace('{l}', s.ambiance_layers || 0).replace('{s}', s.ambiance_spots || 0).replace('{n}', s.ambiance_files || 0)
     + (s.ambiance_now ? t(' — en cours : ') + s.ambiance_now : '')
+    + (s.spot_last ? t(' — dernier ponctuel : {f} (il y a {s} s)').replace('{f}', s.spot_last).replace('{s}', s.spot_ago) : '')
     + (s.error && s.error.startsWith('ambiance') ? ' ⚠ ' + trServer(s.error) : '');
   const rf = $('#radioFiles');
   if (rf) {

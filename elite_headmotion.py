@@ -157,7 +157,8 @@ DEFAULT_CONFIG = {
     "sound": {
         "enabled": True,
         "master": 0.7,
-        "cockpit": {"enabled": True, "volume": 0.45, "gap_s": 4.0, "keep_synth": False, "synth_volume": 0.4},
+        "cockpit": {"enabled": True, "volume": 0.45, "gap_s": 4.0, "spot_interval_s": 25.0,
+                    "keep_synth": False, "synth_volume": 0.4},
         "alerts": {"enabled": True, "volume": 0.4, "interval_s": 20.0},
         "radio": {"enabled": True, "volume": 0.6, "muffle": 0.6, "chatter": 0.5},
         "hangar": {"enabled": True, "volume": 0.5}

@@ -25,7 +25,9 @@ Tous dans le même dossier :
 - `elite_headmotion.py` : le mod
 - `settings.html` : la page de réglages
 - `headmotion_sound.py` : les bruitages d'ambiance (synthétisés au démarrage)
-- `sons/ambiance/` : sons d'ambiance cockpit, joués au hasard (.wav, .ogg, .mp3, .flac)
+- `sons/ambiance/boucles/` : boucles d'ambiance cockpit, toutes jouées en même temps (.wav, .ogg, .mp3, .flac)
+- `sons/ambiance/ponctuels/` : sons courts du cockpit, joués au hasard par-dessus
+- `sons/ambiance/` : longues pistes d'ambiance cockpit, lues l'une après l'autre
 - `sons/radio/` : enregistrements pour la radio du contrôle (.wav, .ogg, .mp3, .flac) ; dossier vide = pas de radio
 - `config.json` : les réglages (créé au premier lancement)
 - `profiles.json` : les profils enregistrés (créé au premier enregistrement)
@@ -79,7 +81,7 @@ La page a deux onglets : **Caméra** et **Bruitages**. Les sons sont synthétis�
 
 | Catégorie | Quand | Contenu |
 |---|---|---|
-| Ambiance cockpit | à bord (`InMainShip`) | fichiers de `sons/ambiance/` au hasard, l'un après l'autre (lecture en flux) ; dossier vide : support vie, ventilation, relais, servos synthétisés |
+| Ambiance cockpit | à bord (`InMainShip`) | en couches : boucles de `sons/ambiance/boucles/` toutes ensemble avec un volume qui varie lentement, sons courts de `sons/ambiance/ponctuels/` au hasard par-dessus, longues pistes de `sons/ambiance/` l'une après l'autre (lecture en flux) ; dossiers vides : support vie, ventilation, relais, servos synthétisés |
 | Alertes de fond | à bord | bips de console, carillons ; alerte sourde si danger, surchauffe, carburant bas, interdiction |
 | Radio du contrôle | près d'une station / installation : `SupercruiseExit` (station), `ApproachSettlement`, zone de non-agression, `DockingRequested` → `Docked` (coupée moteurs arrêtés) ; `Undocked` → fin du blocage de masse ou sortie de zone ; messages des autres vaisseaux (courte transmission) | extraits de `sons/radio/` passés dans le filtre radio ; muette sans fichier |
 | Ambiance hangar | à quai (`Docked`) | machinerie, chocs lointains, annonces réverbérées |

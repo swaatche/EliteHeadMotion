@@ -25,7 +25,9 @@ All in the same folder:
 - `elite_headmotion.py`: the mod
 - `settings.html`: the settings page
 - `headmotion_sound.py`: ambient sound effects (synthesised at startup)
-- `sons/ambiance/`: cockpit ambience sounds, played at random (.wav, .ogg, .mp3, .flac)
+- `sons/ambiance/boucles/`: cockpit loops, all played at once (.wav, .ogg, .mp3, .flac)
+- `sons/ambiance/ponctuels/`: short cockpit sounds, played at random on top
+- `sons/ambiance/`: long cockpit ambience tracks, played one after another
 - `sons/radio/`: recordings for the control radio (.wav, .ogg, .mp3, .flac); empty folder = no radio
 - `config.json`: settings (created on first launch)
 - `profiles.json`: saved profiles (created on first save)
@@ -79,7 +81,7 @@ The page has two tabs: **Camera** and **Sound effects**. Sounds are synthesised 
 
 | Category | When | Content |
 |---|---|---|
-| Cockpit ambience | aboard (`InMainShip`) | files from `sons/ambiance/` at random, one after another (streamed); empty folder: synthesised life support, ventilation, relays, servos |
+| Cockpit ambience | aboard (`InMainShip`) | layered: loops from `sons/ambiance/boucles/` all at once with slowly varying volume, short sounds from `sons/ambiance/ponctuels/` at random on top, long tracks from `sons/ambiance/` one after another (streamed); empty folders: synthesised life support, ventilation, relays, servos |
 | Background alerts | aboard | console beeps, chimes; muffled alarm on danger, overheating, low fuel, interdiction |
 | Control radio | near a station / settlement: `SupercruiseExit` (station), `ApproachSettlement`, no-fire zone, `DockingRequested` → `Docked` (cut when engines shut down); `Undocked` → end of mass lock or leaving the zone; messages from other ships (short transmission) | excerpts from `sons/radio/` run through the radio filter; silent without files |
 | Hangar ambience | docked (`Docked`) | machinery, distant clanks, echoing announcements |
