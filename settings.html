@@ -363,6 +363,21 @@ const EN = {
   'Pause entre deux pistes (s)': 'Pause between tracks (s)', 'Silence moyen entre deux longues pistes de sons/ambiance.': 'Average silence between two long tracks from sons/ambiance.',
   'Intervalle des sons ponctuels (s)': 'One-shot sound interval (s)', 'Temps moyen entre deux sons de sons/ambiance/ponctuels.': 'Average time between two sounds from sons/ambiance/ponctuels.',
   'Boucles : {l} · ponctuels : {s} · pistes : {n}': 'Loops: {l} · one-shots: {s} · tracks: {n}',
+  'Installation abandonnée': 'Abandoned settlement',
+  'Vent planétaire': 'Planetary wind',
+  'Vent sur les planètes à atmosphère, uniquement à pied et à l’extérieur. Les morceaux s’enchaînent avec des fondus d’ouverture et de fermeture qui se chevauchent. L’atmosphère vient des scans du journal ; pour une planète jamais scannée, elle peut être demandée à EDSM.':
+    'Wind on planets with an atmosphere, only on foot and outdoors. Pieces follow one another with overlapping fade-ins and fade-outs. The atmosphere comes from journal scans; for a planet never scanned, it can be looked up on EDSM.',
+  'Durée des fondus (s)': 'Fade length (s)', 'Plus long = transitions plus douces entre les morceaux.': 'Longer = smoother transitions between pieces.',
+  'Chercher l’atmosphère sur EDSM': 'Look up the atmosphere on EDSM', 'Pour une planète jamais scannée (connexion internet).': 'For a planet never scanned (internet connection).',
+  'Sons perso (.wav, .ogg, .mp3, .flac) dans sons/vent : des morceaux de 15 à 60 s, joués au hasard et fondus les uns dans les autres. Dossier vide : vent synthétisé.':
+    'Custom sounds (.wav, .ogg, .mp3, .flac) in sons/vent: pieces of 15 to 60 s, played at random and faded into one another. Empty folder: synthesised wind.',
+  'Fichiers trouvés dans sons/vent : {n}': 'Files found in sons/vent: {n}', 'atmosphère inconnue': 'unknown atmosphere', 'sans atmosphère': 'no atmosphere',
+  'Vent qui siffle dans les structures et métal qui grince, uniquement hors du vaisseau (en SRV ou à pied) sur une installation abandonnée : installation sans marché, base connue (INRA, Dav’s Hope…) ou journal de données abandonné scanné. S’arrête en repartant en supercroisière.':
+    'Wind whistling through structures and creaking metal, only outside the ship (in the SRV or on foot) at an abandoned settlement: a settlement with no market, a known base (INRA, Dav’s Hope…) or after scanning an abandoned data log. Stops when leaving in supercruise.',
+  'Temps moyen entre deux sons de sons/abandonne/ponctuels.': 'Average time between two sounds from sons/abandonne/ponctuels.',
+  'Sons perso (.wav, .ogg, .mp3, .flac) : sons/abandonne/boucles (joués ensemble) et sons/abandonne/ponctuels (au hasard). Dossiers vides : vent synthétisé. Bases supplémentaires : un nom par ligne dans sons/abandonne/bases.txt.':
+    'Custom sounds (.wav, .ogg, .mp3, .flac): sons/abandonne/boucles (played together) and sons/abandonne/ponctuels (at random). Empty folders: synthesised wind. Extra bases: one name per line in sons/abandonne/bases.txt.',
+  'Boucles : {l} · ponctuels : {s}': 'Loops: {l} · one-shots: {s}', ' — site : {n}': ' — site: {n}', ' — aucun site abandonné en cours': ' — no abandoned site right now',
   ' — dernier ponctuel : {f} (il y a {s} s)': ' — last one-shot: {f} ({s} s ago)',
   'Garder l’ambiance synthétisée en fond': 'Keep the synthesised ambience underneath',
   'Volume de l’ambiance synthétisée en fond': 'Background synthesised ambience volume', 'Indépendant du volume des fichiers.': 'Independent from your files’ volume.', 'Ajoute le ronronnement synthétisé sous les fichiers.': 'Adds the synthesised hum under your files.',
@@ -847,6 +862,13 @@ const SOUND_CATS = [
     desc: 'Extraits des enregistrements du dossier sons/radio, étouffés comme sur la fréquence de la station : en fond tant que le vaisseau est près d’une station ou d’une installation (arrivée, appontage, décollage, sortie), coupés moteurs arrêtés sur le pad. Courtes transmissions quand un autre vaisseau envoie un message.',
     extra: [['slider', 'sound.radio.muffle', 'Étouffement', 0, 1, 0.05, 'Plus haut = radio plus lointaine et plus sourde.'],
             ['slider', 'sound.radio.chatter', 'Densité des échanges', 0, 1, 0.05, 'Plus haut = transmissions plus rapprochées.']] },
+  { key: 'abandoned', title: 'Installation abandonnée',
+    desc: 'Vent qui siffle dans les structures et métal qui grince, uniquement hors du vaisseau (en SRV ou à pied) sur une installation abandonnée : installation sans marché, base connue (INRA, Dav’s Hope…) ou journal de données abandonné scanné. S’arrête en repartant en supercroisière.',
+    extra: [['slider', 'sound.abandoned.spot_interval_s', 'Intervalle des sons ponctuels (s)', 5, 120, 1, 'Temps moyen entre deux sons de sons/abandonne/ponctuels.']] },
+  { key: 'wind', title: 'Vent planétaire',
+    desc: 'Vent sur les planètes à atmosphère, uniquement à pied et à l’extérieur. Les morceaux s’enchaînent avec des fondus d’ouverture et de fermeture qui se chevauchent. L’atmosphère vient des scans du journal ; pour une planète jamais scannée, elle peut être demandée à EDSM.',
+    extra: [['slider', 'sound.wind.fade_s', 'Durée des fondus (s)', 1, 20, 0.5, 'Plus long = transitions plus douces entre les morceaux.'],
+            ['toggle', 'sound.wind.edsm', 'Chercher l’atmosphère sur EDSM', 'Pour une planète jamais scannée (connexion internet).']] },
   { key: 'hangar', title: 'Ambiance hangar',
     desc: 'Machinerie, chocs métalliques lointains et annonces réverbérées à quai.' },
 ];
@@ -875,6 +897,14 @@ function soundTab(root) {
       card.append(el('p', { class: 'hint', id: 'ambFiles' }, ''));
       card.append(el('p', { class: 'hint' }, t('Formats .wav, .ogg, .mp3 ou .flac. sons/ambiance/boucles : sons qui bouclent proprement (tuyaux, pompe, ventilateur…), tous joués en même temps avec un volume qui varie lentement. sons/ambiance/ponctuels : sons de quelques secondes (valve, déclic…). sons/ambiance : longues pistes, lues en flux.')));
     }
+    if (c.key === 'wind') {
+      card.append(el('p', { class: 'hint', id: 'windFiles' }, ''));
+      card.append(el('p', { class: 'hint' }, t('Sons perso (.wav, .ogg, .mp3, .flac) dans sons/vent : des morceaux de 15 à 60 s, joués au hasard et fondus les uns dans les autres. Dossier vide : vent synthétisé.')));
+    }
+    if (c.key === 'abandoned') {
+      card.append(el('p', { class: 'hint', id: 'siteFiles' }, ''));
+      card.append(el('p', { class: 'hint' }, t('Sons perso (.wav, .ogg, .mp3, .flac) : sons/abandonne/boucles (joués ensemble) et sons/abandonne/ponctuels (au hasard). Dossiers vides : vent synthétisé. Bases supplémentaires : un nom par ligne dans sons/abandonne/bases.txt.')));
+    }
     if (c.key === 'radio') {
       card.append(el('p', { class: 'hint', id: 'radioFiles' }, ''));
       card.append(el('p', { class: 'hint' }, t('Déposer des fichiers .wav, .ogg, .mp3 ou .flac dans le dossier sons/radio, à côté du mod : des extraits de 3 à 8 s sont pris au hasard et passent dans le filtre radio. Sans fichier, la radio reste muette. Utiliser uniquement des enregistrements dont l’usage est autorisé.')));
@@ -899,6 +929,12 @@ function renderSound() {
     + (s.ambiance_now ? t(' — en cours : ') + s.ambiance_now : '')
     + (s.spot_last ? t(' — dernier ponctuel : {f} (il y a {s} s)').replace('{f}', s.spot_last).replace('{s}', s.spot_ago) : '')
     + (s.error && s.error.startsWith('ambiance') ? ' ⚠ ' + trServer(s.error) : '');
+  const wf = $('#windFiles');
+  if (wf) wf.textContent = t('Fichiers trouvés dans sons/vent : {n}').replace('{n}', s.wind_files || 0)
+    + (s.wind_body ? ' — ' + s.wind_body + ' : ' + (s.wind_atmo === '?' ? t('atmosphère inconnue') : s.wind_atmo === '-' ? t('sans atmosphère') : s.wind_atmo) : '');
+  const sf = $('#siteFiles');
+  if (sf) sf.textContent = t('Boucles : {l} · ponctuels : {s}').replace('{l}', s.site_layers || 0).replace('{s}', s.site_spots || 0)
+    + (s.site ? t(' — site : {n}').replace('{n}', s.site) : t(' — aucun site abandonné en cours'));
   const rf = $('#radioFiles');
   if (rf) {
     rf.textContent = t('Enregistrements trouvés dans sons/radio : {n}').replace('{n}', s.files || 0)

@@ -28,6 +28,8 @@ Tous dans le même dossier :
 - `sons/ambiance/boucles/` : boucles d'ambiance cockpit, toutes jouées en même temps (.wav, .ogg, .mp3, .flac)
 - `sons/ambiance/ponctuels/` : sons courts du cockpit, joués au hasard par-dessus
 - `sons/ambiance/` : longues pistes d'ambiance cockpit, lues l'une après l'autre
+- `sons/abandonne/` : sons des installations abandonnées (`boucles/`, `ponctuels/`) et `bases.txt`, noms d'installations supplémentaires à reconnaître
+- `sons/vent/` : morceaux de vent planétaire, fondus les uns dans les autres
 - `sons/radio/` : enregistrements pour la radio du contrôle (.wav, .ogg, .mp3, .flac) ; dossier vide = pas de radio
 - `config.json` : les réglages (créé au premier lancement)
 - `profiles.json` : les profils enregistrés (créé au premier enregistrement)
@@ -84,6 +86,8 @@ La page a deux onglets : **Caméra** et **Bruitages**. Les sons sont synthétis�
 | Ambiance cockpit | à bord (`InMainShip`) | en couches : boucles de `sons/ambiance/boucles/` toutes ensemble avec un volume qui varie lentement, sons courts de `sons/ambiance/ponctuels/` au hasard par-dessus, longues pistes de `sons/ambiance/` l'une après l'autre (lecture en flux) ; dossiers vides : support vie, ventilation, relais, servos synthétisés |
 | Alertes de fond | à bord | bips de console, carillons ; alerte sourde si danger, surchauffe, carburant bas, interdiction |
 | Radio du contrôle | près d'une station / installation : `SupercruiseExit` (station), `ApproachSettlement`, zone de non-agression, `DockingRequested` → `Docked` (coupée moteurs arrêtés) ; `Undocked` → fin du blocage de masse ou sortie de zone ; messages des autres vaisseaux (courte transmission) | extraits de `sons/radio/` passés dans le filtre radio ; muette sans fichier |
+| Installation abandonnée | hors du vaisseau (SRV ou à pied) sur un site abandonné : installation sans marché (`ApproachSettlement`), base connue comme les bases INRA ou Dav's Hope (`Touchdown`), ou journal de données abandonné scanné ; s'arrête en supercroisière | fichiers de `sons/abandonne/` ; dossiers vides : vent et métal qui grince synthétisés |
+| Vent planétaire | à pied, à l'extérieur, sur une planète à atmosphère (d'après les scans du journal, ou EDSM pour une planète jamais scannée) | morceaux de `sons/vent/` enchaînés avec des fondus d'ouverture et de fermeture qui se chevauchent ; dossier vide : vent fin synthétisé |
 | Ambiance hangar | à quai (`Docked`) | machinerie, chocs lointains, annonces réverbérées |
 
 La radio n'utilise que les enregistrements de `sons/radio/` : des extraits de 3 à 8 s sont pris au hasard et passent dans le filtre radio (bande étroite, saturation, étouffement, souffle, clic d'alternat). Utiliser uniquement des enregistrements dont l'usage est autorisé.

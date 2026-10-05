@@ -10,6 +10,10 @@ Tous les sons sont synthétisés au démarrage (aucun fichier à fournir, aucun 
     filtre radio, pendant une demande d'appontage, l'approche et la sortie de la station
     (dossier vide : pas de radio) ;
   - ambiance hangar : machinerie, chocs métalliques lointains et annonces réverbérées, à quai.
+  - installation abandonnée : vent, métal qui grince ; uniquement hors du vaisseau (SRV ou à pied)
+    sur un site abandonné (installation sans marché, base de la liste, journal abandonné scanné).
+  - vent planétaire : à pied, à l'extérieur, sur une planète à atmosphère ; morceaux de sons/vent
+    enchaînés avec des fondus d'ouverture et de fermeture qui se chevauchent.
 
 Radio : dépose des enregistrements (.wav / .ogg / .mp3 / .flac) dans le dossier « sons/radio »
 à côté du mod. Des extraits y sont pris au hasard et passent dans le filtre radio
@@ -17,6 +21,7 @@ Radio : dépose des enregistrements (.wav / .ogg / .mp3 / .flac) dans le dossier
 """
 
 import glob
+import json
 import math
 import os
 import queue
@@ -31,12 +36,18 @@ except ImportError:  # pragma: no cover - numpy est requis pour les bruitages
 
 import pygame
 
-CATEGORIES = ("cockpit", "alerts", "radio", "hangar")
+CATEGORIES = ("cockpit", "alerts", "radio", "hangar", "abandoned", "wind")
 AUDIO_EXT = (".wav", ".ogg", ".mp3", ".flac")
-LAYER_BASE, MAX_LAYERS = 4, 8   # canaux réservés aux boucles superposées de sons/ambiance/boucles
+MAX_LAYERS = 8                  # boucles superposées au maximum par groupe
+COCKPIT_LAYERS = 5              # canaux 5-12 : boucles de sons/ambiance/boucles
+SITE_LAYERS = COCKPIT_LAYERS + MAX_LAYERS      # canaux 13-20 : boucles de sons/abandonne/boucles
+WIND_CHANNELS = SITE_LAYERS + MAX_LAYERS        # canaux 21-23 : morceaux de vent en fondu enchaîné
+RESERVED = WIND_CHANNELS + 3                   # canaux réservés ; les sons courts utilisent les suivants
 
 # Bits du champ Flags de Status.json utilisés ici
-F_DOCKED, F_INSHIP = 0, 24
+F_DOCKED, F_INSHIP, F_INSRV = 0, 24, 26
+F2_ONFOOT, F2_ONFOOT_PLANET, F2_INHANGAR, F2_SOCIAL, F2_EXTERIOR = 0, 4, 13, 14, 15  # champ Flags2 (Odyssey)
+EDSM_BODIES = "https://www.edsm.net/api-system-v1/bodies"
 F_MASSLOCK = 16
 F_LOWFUEL, F_OVERHEAT, F_DANGER, F_INTERDICT = 19, 20, 22, 23
 
@@ -57,6 +68,22 @@ APPROACH_MAX_S = 900.0   # présence près d'une station / installation : durée
 LEAVE_MAX_S = 180.0      # sortie de station : durée maximale de la radio
 LEAVE_FALLBACK_S = 45.0  # sans fichier d'état : durée fixe après le décollage
 LEAVE_TAIL_S = 8.0       # radio encore active après la fin du blocage de masse / de la zone
+
+# Installation abandonnée : bases connues qu'Elite ne signale pas comme abandonnées (Horizons).
+# Le joueur peut en ajouter dans sons/abandonne/bases.txt (un nom par ligne).
+KNOWN_ABANDONED = (
+    # Bases INRA
+    "Carmichael Point", "Taylor Keep", "Stack", "Almeida Landing", "Velasquez Medical Research Centre",
+    "Hogan Depot", "Mayes Chemical Plant", "Klatt Enterprises", "Hollis Gateway", "Stuart Retreat",
+    # Autres installations abandonnées
+    "Lookout", "Medical Test Facility", "Exploration Camp JSPR-003", "Orion's Folly",
+    "Medical Research Base BJI-86", "Site 16", "Dixon Dock", "Research Facility 5592", "Dav's Hope",
+    "Exploration Camp C-NO4", "Colony SN-B 86", "Crowther's Rest", "Herpin Research Base",
+    "Planet Dave Outpost", "The Church of the Path", "Geological Survey 23B", "Extraction Site HS-98",
+    "Serene Harbour R", "Oaken Point", "Fort Asch", "Holloway Bioscience Research Facility 15",
+)
+SITE_END_EVENTS = {"SupercruiseEntry", "StartJump", "FSDJump", "Docked", "Died", "Shutdown"}
+SITE_MAX_S = 3 * 3600.0  # sécurité : l'ambiance du site s'arrête après 3 h
 
 
 # ----------------------------------------------------------------------------- DSP
@@ -293,6 +320,43 @@ class Synth:
         x[: int(0.004 * sr)] += self.noise(int(0.004 * sr)) * 0.5
         return x
 
+    def wind_loop(self, seconds=24.0):
+        """Vent qui siffle dans des structures vides, métal qui travaille au loin."""
+        sr, rng = self.sr, self.rng
+        n = int(seconds * sr)
+        t = np.arange(n) / sr
+        chans = []
+        for c in range(2):
+            gust = 0.55 + 0.45 * np.sin(2 * np.pi * (0.045 + 0.01 * c) * t + 1.7 * c) ** 2
+            low = bandpass(self.noise(n), sr, 60, 500) * gust
+            whistle = bandpass(self.noise(n), sr, 700 + 150 * c, 1400 + 200 * c) * gust ** 2 * 0.5
+            chans.append(normalize(low, 1) + normalize(whistle, 0.6))
+        events = np.zeros(n)
+        for _ in range(int(rng.integers(2, 4))):
+            k = self.clank() * rng.uniform(0.15, 0.35)
+            st = int(rng.uniform(0, seconds - 1.5) * sr)
+            events[st:st + len(k)] += k[: n - st]
+        wet = bandpass(reverb(events, sr, 3.5, 0.85, 1800, rng)[:n], sr, 80, 1800)
+        x = np.stack([chans[0] + wet, chans[1] + np.roll(wet, int(0.02 * sr))], axis=1)
+        return seamless(normalize(x, 0.5), sr, 2.0)
+
+    def thin_wind(self, seconds=22.0):
+        """Un morceau de vent d'atmosphère fine (sifflement léger, rafales), à enchaîner en fondu."""
+        sr, rng = self.sr, self.rng
+        n = int(seconds * sr)
+        t = np.arange(n) / sr
+        chans = []
+        f1, f2 = rng.uniform(0.03, 0.08), rng.uniform(0.11, 0.2)
+        lo, hi = rng.uniform(250, 500), rng.uniform(1800, 3200)
+        for c in range(2):
+            gust = 0.35 + 0.65 * (0.5 + 0.5 * np.sin(2 * np.pi * f1 * t + rng.uniform(0, 6))) ** 2
+            gust *= 0.8 + 0.2 * np.sin(2 * np.pi * f2 * t + c)
+            body = bandpass(self.noise(n), sr, lo, hi) * gust
+            hiss = bandpass(self.noise(n), sr, 3500, 7500) * gust ** 3 * 0.25
+            moan = bandpass(self.noise(n), sr, 420 + 60 * c, 520 + 60 * c) * gust ** 2 * 0.6
+            chans.append(normalize(body, 1) + hiss + normalize(moan, 0.5))
+        return normalize(np.stack(chans, axis=1), 0.5)
+
     def hangar_loop(self, seconds=24.0, muffle=0.7):
         sr, rng = self.sr, self.rng
         n = int(seconds * sr)
@@ -321,10 +385,136 @@ class Synth:
 
 # ----------------------------------------------------------------------------- moteur
 
+class LayerGroup:
+    """Boucles d'un dossier jouées en même temps sur des canaux réservés, chacune avec un volume
+    qui varie lentement et un placement gauche/droite fixe."""
+
+    def __init__(self, folder, base):
+        self.folder, self.base = folder, base
+        self.files, self.snd, self.layers = [], {}, {}
+
+    def update(self, on, volume, dt, now, rng):
+        wanted = [p for p in self.files if p in self.snd][:MAX_LAYERS]
+        for p in list(self.layers):                      # fichier retiré du dossier
+            if p not in wanted:
+                pygame.mixer.Channel(self.layers.pop(p)["ch"]).fadeout(1500)
+        used = {st["ch"] for st in self.layers.values()}
+        free = [self.base + i for i in range(MAX_LAYERS) if self.base + i not in used]
+        for p in wanted:
+            if p not in self.layers and free:
+                self.layers[p] = {"ch": free.pop(0), "gain": 0.0, "target": rng.uniform(0.6, 1.0),
+                                  "next": now + rng.uniform(6, 18), "pan": rng.uniform(-0.45, 0.45),
+                                  "start": now + rng.uniform(0.0, 4.0)}  # départs décalés
+        for p, st in self.layers.items():
+            ch = pygame.mixer.Channel(st["ch"])
+            if on:
+                if now >= st["next"]:
+                    st["target"] = rng.uniform(0.55, 1.0)
+                    st["next"] = now + rng.uniform(6, 18)
+                target = st["target"] if now >= st["start"] else 0.0
+            else:
+                target = 0.0
+            st["gain"] += (target - st["gain"]) * min(1.0, dt / 3.0)
+            if target == 0.0 and st["gain"] < 0.002:
+                st["gain"] = 0.0
+            if st["gain"] > 0.0:
+                if not ch.get_busy():
+                    ch.play(self.snd[p], loops=-1)
+                v = volume * st["gain"]
+                ch.set_volume(v * (1 - max(st["pan"], 0)), v * (1 + min(st["pan"], 0)))
+            elif ch.get_busy():
+                ch.stop()
+                st["start"] = now + rng.uniform(0.0, 4.0)
+
+
+class SpotGroup:
+    """Sons courts d'un dossier, joués au hasard par-dessus l'ambiance."""
+
+    def __init__(self, folder):
+        self.folder = folder
+        self.files, self.snd = [], {}
+        self.last, self.time = None, 0.0
+        self.next = time.monotonic() + 5
+
+    def update(self, on, volume, interval, now, rng, channel):
+        spots = [p for p in self.files if p in self.snd]
+        if not (on and spots):
+            self.next = max(self.next, now + 3.0)
+            return
+        if now < self.next:
+            return
+        p = random.choice([s for s in spots if s != self.last] or spots)
+        ch = channel()
+        if ch is not None:
+            pan = rng.uniform(-0.7, 0.7)
+            v = volume * rng.uniform(0.7, 1.0)
+            ch.play(self.snd[p])
+            ch.set_volume(v * (1 - max(pan, 0)), v * (1 + min(pan, 0)))
+            self.last, self.time = p, now
+        self.next = now + max(2.0, interval) * rng.uniform(0.5, 1.5)
+
+
+class CrossfadeGroup:
+    """Morceaux joués à la suite, chacun avec un fondu d'ouverture et de fermeture ; le suivant
+    commence pendant le fondu de fermeture du précédent, si bien que les fondus se chevauchent."""
+
+    def __init__(self, folder, base, count=3):
+        self.folder = folder
+        self.channels = list(range(base, base + count))
+        self.files, self.snd = [], {}
+        self.synth = []            # morceaux synthétisés, quand le dossier est vide
+        self.pieces = {}           # canal -> {start, length, fade, gain, pan}
+        self.next = 0.0
+        self.last = None
+        self.gain = 0.0            # fondu global (arrivée / départ de l'ambiance)
+
+    def _choices(self):
+        loaded = [(p, self.snd[p]) for p in self.files if p in self.snd]
+        return loaded or [(f"synth{i}", s) for i, s in enumerate(self.synth)]
+
+    def update(self, on, volume, fade_s, dt, now, rng):
+        self.gain += ((1.0 if on else 0.0) - self.gain) * min(1.0, dt / 2.0)
+        if not on and self.gain < 0.003:
+            self.gain = 0.0
+            for ch in self.channels:
+                pygame.mixer.Channel(ch).stop()
+            self.pieces.clear()
+            self.next = now
+            return
+        choices = self._choices()
+        if on and choices and now >= self.next:
+            free = [c for c in self.channels if c not in self.pieces]
+            if free:
+                key, snd = rng_choice([c for c in choices if c[0] != self.last] or choices, rng)
+                length = snd.get_length()
+                fade = max(0.3, min(fade_s, length / 3))
+                ch = free[0]
+                pygame.mixer.Channel(ch).play(snd)
+                self.pieces[ch] = {"start": now, "length": length, "fade": fade,
+                                   "gain": rng.uniform(0.6, 1.0), "pan": rng.uniform(-0.5, 0.5)}
+                self.last = key
+                # le suivant démarre pendant la fermeture de celui-ci : fondus imbriqués
+                self.next = now + max(fade, length - fade - rng.uniform(0.0, fade))
+        for ch, pc in list(self.pieces.items()):
+            el = now - pc["start"]
+            if el >= pc["length"] or not pygame.mixer.Channel(ch).get_busy() and el > 0.2:
+                pygame.mixer.Channel(ch).stop()
+                del self.pieces[ch]
+                continue
+            env = min(1.0, el / pc["fade"], max(0.0, pc["length"] - el) / pc["fade"])
+            env = env * env * (3 - 2 * env)                       # fondu doux
+            v = volume * self.gain * pc["gain"] * env
+            pygame.mixer.Channel(ch).set_volume(v * (1 - max(pc["pan"], 0)), v * (1 + min(pc["pan"], 0)))
+
+
+def rng_choice(seq, rng):
+    return seq[int(rng.integers(0, len(seq)))]
+
+
 class SoundEngine:
     """Joue les ambiances selon l'état du jeu (Status.json / journal) et les réglages."""
 
-    CH_COCKPIT, CH_HANGAR, CH_WARNING, CH_RADIO = 0, 1, 2, 3
+    CH_COCKPIT, CH_HANGAR, CH_WARNING, CH_RADIO, CH_SITE = 0, 1, 2, 3, 4
 
     def __init__(self, sounds_dir):
         self.ok = False
@@ -333,15 +523,31 @@ class SoundEngine:
         self.sounds_dir = sounds_dir
         self.radio_dir = os.path.join(sounds_dir, "radio")
         self.ambiance_dir = os.path.join(sounds_dir, "ambiance")
-        self.layer_dir = os.path.join(self.ambiance_dir, "boucles")
-        self.spot_dir = os.path.join(self.ambiance_dir, "ponctuels")
-        self.layer_files, self.spot_files = [], []
-        self.layer_snd, self.spot_snd = {}, {}   # fichiers chargés en mémoire (thread)
-        self.layers = {}                         # boucle en cours -> canal, gain, cible, pan
+        self.site_dir = os.path.join(sounds_dir, "abandonne")
+        self.cockpit_layers = LayerGroup(os.path.join(self.ambiance_dir, "boucles"), COCKPIT_LAYERS)
+        self.cockpit_spots = SpotGroup(os.path.join(self.ambiance_dir, "ponctuels"))
+        self.site_layers = LayerGroup(os.path.join(self.site_dir, "boucles"), SITE_LAYERS)
+        self.site_spots = SpotGroup(os.path.join(self.site_dir, "ponctuels"))
+        self.wind = CrossfadeGroup(os.path.join(sounds_dir, "vent"), WIND_CHANNELS)
+        self.groups = (self.cockpit_layers, self.cockpit_spots, self.site_layers, self.site_spots, self.wind)
+        # Vent planétaire : atmosphère des planètes (scans du journal, sinon EDSM)
+        self.atmo = {}             # nom du corps -> description de l'atmosphère ("" = aucune)
+        self.atmo_lock = threading.Lock()
+        self.atmo_pending = set()
+        self.body = ""             # corps où l'on se trouve (Status.json / journal)
+        self.status_body = ""
+        self.system = ""
+        self.exterior_seen = False
+        self.use_edsm = True
         self.loading = False
-        self.spot_last = None
-        self.spot_time = 0.0
-        self.next_spot = time.monotonic() + 5
+        # Installation abandonnée : on est sur le site (journal) ; les sons ne jouent que hors du vaisseau
+        self.site = False
+        self.site_name = ""
+        self.site_until = 0.0
+        self.off_ship = False      # d'après le journal, quand Status.json ne le dit pas
+        self.flags2 = 0            # champ Flags2 de Status.json (à pied), fourni par le mod
+        self.site_names = set()
+        self.site_names_scan = 0.0
         self.amb_files, self.amb_bad = [], set()
         self.radio_bad = set()
         self.amb_scan = 0.0
@@ -353,7 +559,7 @@ class SoundEngine:
         self.pool = queue.Queue(maxsize=6)
         self.pool_muffle = None
         self.muffle = 0.6
-        self.loop_vol = {"cockpit": 0.0, "hangar": 0.0, "warning": 0.0}
+        self.loop_vol = {"cockpit": 0.0, "hangar": 0.0, "warning": 0.0, "site": 0.0}
         self.radio_until = 0.0
         self.radio_cut = False
         self.radio_fading = False
@@ -366,6 +572,7 @@ class SoundEngine:
         self.next_tx = 0.0
         self.next_alert = time.monotonic() + 6
         self.next_mech = time.monotonic() + 4
+        self.next_creak = time.monotonic() + 5
         self.test_until = {c: 0.0 for c in CATEGORIES}
         self.active = []
         self.last_update = time.monotonic()
@@ -378,16 +585,16 @@ class SoundEngine:
                 pygame.mixer.init()
             sr, _size, channels = pygame.mixer.get_init()
             self.sr, self.channels = sr, channels
-            pygame.mixer.set_num_channels(24)
-            pygame.mixer.set_reserved(LAYER_BASE + MAX_LAYERS)
+            pygame.mixer.set_num_channels(RESERVED + 12)
+            pygame.mixer.set_reserved(RESERVED)
             self.ok = True
         except pygame.error as e:
             self.error = f"audio indisponible : {e}"
             return
         try:
             os.makedirs(self.radio_dir, exist_ok=True)
-            os.makedirs(self.layer_dir, exist_ok=True)
-            os.makedirs(self.spot_dir, exist_ok=True)
+            for g in self.groups:
+                os.makedirs(g.folder, exist_ok=True)
         except OSError:
             pass
         self.synth = Synth(self.sr)
@@ -416,12 +623,16 @@ class SoundEngine:
                 "cockpit": self._to_sound(s.cockpit_loop()),
                 "warning": self._to_sound(s.warning_loop(), 0.2),
                 "hangar": self._to_sound(s.hangar_loop()),
+                "site": self._to_sound(s.wind_loop()),
+                "thin_wind": [self._to_sound(s.thin_wind(self.synth.rng.uniform(16, 26))) for _ in range(4)],
+                "clank": [s.clank() * 0.6 for _ in range(4)],
                 "relay": [s.relay_click() for _ in range(4)],
                 "servo": [s.servo() for _ in range(4)],
                 "chirp": [s.chirp() for _ in range(6)],
                 "chime": [s.chime() for _ in range(4)],
             }
             self.bank = b
+            self.wind.synth = b["thin_wind"]
             self.ready = True
         except Exception as e:  # noqa: BLE001 - on ne doit jamais faire tomber le mod pour un son
             self.error = f"génération des sons : {e}"
@@ -482,8 +693,135 @@ class SoundEngine:
                 time.sleep(2)
 
     # --- entrées --------------------------------------------------------------
+    # --- vent planétaire : atmosphère des corps -------------------------------
+    def _body_event(self, name, event):
+        if "StarSystem" in event:
+            self.system = str(event["StarSystem"])
+        if name == "Scan" and event.get("BodyName"):
+            with self.atmo_lock:
+                self.atmo[str(event["BodyName"])] = str(event.get("Atmosphere", "") or "")
+        elif name in ("Disembark", "Touchdown", "ApproachBody", "Location") and event.get("Body"):
+            self.body = str(event["Body"])
+        elif name in ("LeaveBody", "FSDJump", "SupercruiseEntry"):
+            self.body = ""
+
+    def load_atmospheres(self, journal_dir, cache_path):
+        """Relit les scans de tous les journaux (thread), avec un cache pour ne relire que les nouveaux."""
+        def work():
+            cache = {"files": {}, "bodies": {}}
+            try:
+                with open(cache_path, encoding="utf-8") as f:
+                    cache.update(json.load(f))
+            except (OSError, ValueError):
+                pass
+            changed = False
+            for path in sorted(glob.glob(os.path.join(journal_dir, "Journal.*.log"))):
+                key, size = os.path.basename(path), os.path.getsize(path)
+                if cache["files"].get(key) == size:
+                    continue
+                try:
+                    with open(path, encoding="utf-8", errors="ignore") as f:
+                        for line in f:
+                            if '"event":"Scan"' not in line:
+                                continue
+                            try:
+                                e = json.loads(line)
+                            except ValueError:
+                                continue
+                            if e.get("BodyName"):
+                                cache["bodies"][e["BodyName"]] = str(e.get("Atmosphere", "") or "")
+                except OSError:
+                    continue
+                cache["files"][key] = size
+                changed = True
+            with self.atmo_lock:
+                for k, v in cache["bodies"].items():
+                    self.atmo.setdefault(k, v)
+            if changed:
+                try:
+                    with open(cache_path, "w", encoding="utf-8") as f:
+                        json.dump(cache, f)
+                except OSError:
+                    pass
+        threading.Thread(target=work, daemon=True).start()
+
+    def _atmosphere(self, body):
+        """Atmosphère du corps ("" = aucune, None = inconnue). Inconnue : demande à EDSM (thread)."""
+        if not body:
+            return None
+        with self.atmo_lock:
+            if body in self.atmo:
+                return self.atmo[body]
+        if self.use_edsm and body not in self.atmo_pending:
+            self.atmo_pending.add(body)
+            threading.Thread(target=self._edsm_lookup, args=(body, self.system), daemon=True).start()
+        return None
+
+    def _edsm_lookup(self, body, system):
+        import urllib.parse
+        import urllib.request
+        tokens = body.split()
+        candidates = [system] if system and body.startswith(system) else []
+        candidates += [" ".join(tokens[:i]) for i in range(len(tokens) - 1, max(0, len(tokens) - 4), -1)]
+        for sysname in dict.fromkeys(c for c in candidates if c):
+            try:
+                url = EDSM_BODIES + "?" + urllib.parse.urlencode({"systemName": sysname})
+                req = urllib.request.Request(url, headers={"User-Agent": "EliteHeadMotion"})
+                with urllib.request.urlopen(req, timeout=6) as r:
+                    data = json.loads(r.read().decode("utf-8") or "{}")
+            except (OSError, ValueError):
+                continue
+            found = {}
+            for b in (data.get("bodies") or []) if isinstance(data, dict) else []:
+                a = str(b.get("atmosphereType") or "")
+                found[str(b.get("name", ""))] = "" if a.lower() in ("", "no atmosphere", "none") else a
+            if body in found:
+                with self.atmo_lock:
+                    self.atmo.update({k: v for k, v in found.items() if k not in self.atmo})
+                return
+
+    def _known_site(self, name):
+        """Nom d'une base abandonnée connue (liste intégrée + sons/abandonne/bases.txt)."""
+        now = time.monotonic()
+        if now - self.site_names_scan > 10.0:
+            self.site_names_scan = now
+            names = {n.lower() for n in KNOWN_ABANDONED}
+            try:
+                with open(os.path.join(self.site_dir, "bases.txt"), encoding="utf-8-sig") as f:
+                    names |= {ln.strip().lower() for ln in f if ln.strip() and not ln.lstrip().startswith("#")}
+            except OSError:
+                pass
+            self.site_names = names
+        return bool(name) and name.strip().lower() in self.site_names
+
+    def _start_site(self, name, now):
+        self.site_name = name or (self.site_name if self.site else "") or "?"
+        self.site = True
+        self.site_until = now + SITE_MAX_S
+
+    def _site_event(self, name, event, now):
+        """Installation abandonnée : début et fin du site d'après le journal."""
+        if name == "ApproachSettlement":
+            sname = str(event.get("Name", ""))
+            if "MarketID" not in event and not sname.startswith("$"):
+                self._start_site(sname, now)   # installation sans marché ni faction : abandonnée
+            elif "MarketID" in event:
+                self.site = False              # installation habitée
+        elif "NearestDestination" in event and self._known_site(str(event.get("NearestDestination", ""))):
+            self._start_site(str(event["NearestDestination"]), now)   # atterrissage près d'une base connue
+        elif name == "DataScanned" and "abandoned" in str(event.get("Type", "")).lower():
+            self._start_site("", now)                                  # journal de données abandonné
+        elif name in SITE_END_EVENTS:
+            self.site = False
+        if name in ("LaunchSRV", "Disembark"):
+            self.off_ship = True
+        elif name in ("DockSRV", "Embark", "SupercruiseEntry") or (name == "Liftoff" and event.get("PlayerControlled", True)):
+            self.off_ship = name == "Embark" and bool(event.get("SRV"))
+
     def on_event(self, name, event):
         now = time.monotonic()
+        self._site_event(name, event, now)
+        self._body_event(name, event)
         if name in RADIO_CUT_EVENTS:
             self.radio_until = 0.0
             self.radio_cut = True
@@ -493,8 +831,8 @@ class SoundEngine:
             self._start_near("leave", LEAVE_MAX_S, now)
         elif name == "SupercruiseExit" and str(event.get("BodyType", "")) == "Station":
             self._start_near("approach", APPROACH_MAX_S, now)  # arrivée près d'une station
-        elif name == "ApproachSettlement":
-            self._start_near("approach", APPROACH_MAX_S, now)  # arrivée près d'une installation
+        elif name == "ApproachSettlement" and "MarketID" in event:
+            self._start_near("approach", APPROACH_MAX_S, now)  # arrivée près d'une installation habitée
         elif name in RADIO_EVENTS:
             if not self.near:
                 self._start_near("approach", APPROACH_MAX_S, now)
@@ -544,14 +882,19 @@ class SoundEngine:
             if cat == "cockpit":
                 self.amb_next = now
                 self.next_mech = now + 1.5
-                self.next_spot = now + 2.0  # un son ponctuel pendant l'écoute
+                self.cockpit_spots.next = now + 2.0  # un son ponctuel pendant l'écoute
+            if cat == "wind":
+                self.wind.next = now
+            if cat == "abandoned":
+                self.site_spots.next = now + 2.0
+                self.next_creak = now + 2.0
 
     # --- boucle ---------------------------------------------------------------
     @staticmethod
     def _free_channel():
         """Canal libre hors des canaux réservés (pygame peut renvoyer un canal réservé,
         qui serait aussitôt coupé par la gestion des boucles)."""
-        for i in range(LAYER_BASE + MAX_LAYERS, pygame.mixer.get_num_channels()):
+        for i in range(RESERVED, pygame.mixer.get_num_channels()):
             ch = pygame.mixer.Channel(i)
             if not ch.get_busy():
                 return ch
@@ -607,13 +950,14 @@ class SoundEngine:
         if now - self.amb_scan > 5.0:
             self.amb_scan = now
             self.amb_files = [p for p in self._scan(self.ambiance_dir) if p not in self.amb_bad]
-            self.layer_files = [p for p in self._scan(self.layer_dir) if p not in self.amb_bad]
-            self.spot_files = [p for p in self._scan(self.spot_dir) if p not in self.amb_bad]
-            missing = [p for p in self.layer_files + self.spot_files if p not in self.layer_snd and p not in self.spot_snd]
+            missing = False
+            for g in self.groups:
+                g.files = [p for p in self._scan(g.folder) if p not in self.amb_bad]
+                missing = missing or any(p not in g.snd for p in g.files)
             if missing and not self.loading:
                 self.loading = True
                 threading.Thread(target=self._load_ambiance, daemon=True).start()
-        use_files = bool(self.amb_files or self.layer_files or self.spot_files)
+        use_files = bool(self.amb_files or self.cockpit_layers.files or self.cockpit_spots.files)
         synth_on = not use_files or bool(cc.get("keep_synth", False))
         # Volume de l'ambiance synthétisée : le volume cockpit si elle est seule,
         # son propre volume quand elle reste en fond sous tes fichiers
@@ -624,8 +968,43 @@ class SoundEngine:
         cockpit_on = (in_ship or testing["cockpit"]) and vol("cockpit") > 0
         self._loop(self.CH_COCKPIT, "cockpit", synth_vol * 0.6 if cockpit_on and synth_on else 0.0, dt)
         self._ambiance_files(cockpit_on and bool(self.amb_files), vol("cockpit"), float(cc.get("gap_s", 4.0)), now)
-        self._ambiance_layers(cockpit_on, vol("cockpit"), dt, now)
-        self._ambiance_spots(cockpit_on, vol("cockpit"), float(cc.get("spot_interval_s", 25.0)), now)
+        rng = self.synth.rng
+        self.cockpit_layers.update(cockpit_on, vol("cockpit"), dt, now, rng)
+        self.cockpit_spots.update(cockpit_on, vol("cockpit"), float(cc.get("spot_interval_s", 25.0)),
+                                  now, rng, self._free_channel)
+        # Installation abandonnée : seulement hors du vaisseau (SRV ou à pied)
+        ac = cat["abandoned"]
+        if self.site and now > self.site_until:
+            self.site = False
+        if has_status:
+            off_ship = bool(flags & (1 << F_INSRV)) or bool(self.flags2 & (1 << F2_ONFOOT))
+        else:
+            off_ship = self.off_ship
+        site_on = ((self.site and off_ship) or testing["abandoned"]) and vol("abandoned") > 0
+        site_files = bool(self.site_layers.files or self.site_spots.files)
+        self._loop(self.CH_SITE, "site", vol("abandoned") * 0.6 if site_on and not site_files else 0.0, dt)
+        self.site_layers.update(site_on, vol("abandoned"), dt, now, rng)
+        self.site_spots.update(site_on, vol("abandoned"), float(ac.get("spot_interval_s", 20.0)),
+                               now, rng, self._free_channel)
+        # Vent planétaire : à pied, à l'extérieur, sur une planète à atmosphère
+        wc = cat["wind"]
+        self.use_edsm = bool(wc.get("edsm", True))
+        f2 = self.flags2
+        if f2 & (1 << F2_EXTERIOR):
+            self.exterior_seen = True
+        outside = (bool(f2 & (1 << F2_ONFOOT_PLANET)) and not f2 & ((1 << F2_INHANGAR) | (1 << F2_SOCIAL))
+                   and (bool(f2 & (1 << F2_EXTERIOR)) or not self.exterior_seen))
+        body = self.status_body or self.body
+        atmo = self._atmosphere(body) if outside else None
+        wind_on = ((outside and bool(atmo)) or testing["wind"]) and vol("wind") > 0
+        self.wind.update(wind_on, vol("wind"), float(wc.get("fade_s", 6.0)), dt, now, rng)
+        if wind_on:
+            active.append("wind")
+        if site_on:
+            active.append("abandoned")
+            if not site_files and now >= self.next_creak:
+                self._play_oneshot(random.choice(self.bank["clank"]), vol("abandoned") * 0.5)
+                self.next_creak = now + rng.uniform(8, 25)
         if cockpit_on:
             active.append("cockpit")
             if synth_on and now >= self.next_mech:
@@ -728,85 +1107,42 @@ class SoundEngine:
             music.set_volume(volume)
 
     def _load_ambiance(self):
-        """Charge en mémoire les boucles et les sons ponctuels (thread : le décodage peut être lent)."""
+        """Charge en mémoire les boucles et les sons courts (thread : le décodage peut être lent)."""
         try:
-            for files, dest in ((self.layer_files, self.layer_snd), (self.spot_files, self.spot_snd)):
-                for p in list(files):
-                    if p in dest or p in self.amb_bad:
+            for g in self.groups:
+                for p in list(g.files):
+                    if p in g.snd or p in self.amb_bad:
                         continue
                     try:
-                        dest[p] = pygame.mixer.Sound(p)
+                        g.snd[p] = pygame.mixer.Sound(p)
                     except pygame.error as e:
                         self.amb_bad.add(p)
                         self.error = f"ambiance : {os.path.basename(p)} illisible ({e})"
         finally:
             self.loading = False
 
-    def _ambiance_layers(self, on, volume, dt, now):
-        """Boucles de sons/ambiance/boucles jouées en même temps, chacune avec un volume qui
-        varie lentement et un placement gauche/droite fixe : l'ensemble ne sonne jamais pareil."""
-        rng = self.synth.rng
-        wanted = [p for p in self.layer_files if p in self.layer_snd][:MAX_LAYERS]
-        for p in list(self.layers):                      # fichier retiré du dossier
-            if p not in wanted:
-                pygame.mixer.Channel(self.layers.pop(p)["ch"]).fadeout(1500)
-        used = {st["ch"] for st in self.layers.values()}
-        free = [LAYER_BASE + i for i in range(MAX_LAYERS) if LAYER_BASE + i not in used]
-        for p in wanted:
-            if p not in self.layers and free:
-                self.layers[p] = {"ch": free.pop(0), "gain": 0.0, "target": rng.uniform(0.6, 1.0),
-                                  "next": now + rng.uniform(6, 18), "pan": rng.uniform(-0.45, 0.45),
-                                  "start": now + rng.uniform(0.0, 4.0)}  # départs décalés
-        for p, st in self.layers.items():
-            ch = pygame.mixer.Channel(st["ch"])
-            if on:
-                if now >= st["next"]:
-                    st["target"] = rng.uniform(0.55, 1.0)
-                    st["next"] = now + rng.uniform(6, 18)
-                target = st["target"] if now >= st["start"] else 0.0
-            else:
-                target = 0.0
-            st["gain"] += (target - st["gain"]) * min(1.0, dt / 3.0)
-            if target == 0.0 and st["gain"] < 0.002:
-                st["gain"] = 0.0
-            if st["gain"] > 0.0:
-                if not ch.get_busy():
-                    ch.play(self.layer_snd[p], loops=-1)
-                v = volume * st["gain"]
-                ch.set_volume(v * (1 - max(st["pan"], 0)), v * (1 + min(st["pan"], 0)))
-            elif ch.get_busy():
-                ch.stop()
-                st["start"] = now + rng.uniform(0.0, 4.0)
-
-    def _ambiance_spots(self, on, volume, interval, now):
-        """Sons courts de sons/ambiance/ponctuels, joués au hasard par-dessus l'ambiance."""
-        spots = [p for p in self.spot_files if p in self.spot_snd]
-        if not (on and spots):
-            self.next_spot = max(self.next_spot, now + 3.0)
-            return
-        if now < self.next_spot:
-            return
-        rng = self.synth.rng
-        p = random.choice([s for s in spots if s != self.spot_last] or spots)
-        ch = self._free_channel()
-        if ch is not None:
-            pan = rng.uniform(-0.7, 0.7)
-            v = volume * rng.uniform(0.7, 1.0)
-            ch.play(self.spot_snd[p])
-            ch.set_volume(v * (1 - max(pan, 0)), v * (1 + min(pan, 0)))
-            self.spot_last = p
-            self.spot_time = now
-        self.next_spot = now + max(2.0, interval) * rng.uniform(0.5, 1.5)
-
     def status(self):
         return {"ok": self.ok, "ready": self.ready, "error": self.error,
                 "files": len(self.files), "active": self.active,
                 "radio_dir": self.radio_dir,
                 "ambiance_files": len(self.amb_files),
-                "ambiance_layers": len(self.layer_files), "ambiance_spots": len(self.spot_files),
-                "spot_last": os.path.basename(self.spot_last) if self.spot_last else "",
-                "spot_ago": round(time.monotonic() - self.spot_time) if self.spot_last else None,
+                "ambiance_layers": len(self.cockpit_layers.files), "ambiance_spots": len(self.cockpit_spots.files),
+                "spot_last": os.path.basename(self.cockpit_spots.last) if self.cockpit_spots.last else "",
+                "spot_ago": round(time.monotonic() - self.cockpit_spots.time) if self.cockpit_spots.last else None,
+                "site": self.site_name if self.site else "",
+                "site_layers": len(self.site_layers.files), "site_spots": len(self.site_spots.files),
+                "wind_files": len(self.wind.files),
+                "wind_body": self.status_body or self.body,
+                "wind_atmo": self._atmo_label(),
                 "ambiance_now": os.path.basename(self.amb_playing) if self.amb_playing else ""}
+
+    def _atmo_label(self):
+        body = self.status_body or self.body
+        if not body:
+            return ""
+        with self.atmo_lock:
+            a = self.atmo.get(body)
+        return "?" if a is None else (a or "-")
 
     def stop(self):
         self._stop = True

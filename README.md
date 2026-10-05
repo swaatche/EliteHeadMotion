@@ -28,6 +28,8 @@ All in the same folder:
 - `sons/ambiance/boucles/`: cockpit loops, all played at once (.wav, .ogg, .mp3, .flac)
 - `sons/ambiance/ponctuels/`: short cockpit sounds, played at random on top
 - `sons/ambiance/`: long cockpit ambience tracks, played one after another
+- `sons/abandonne/`: sounds for abandoned settlements (`boucles/`, `ponctuels/`) and `bases.txt`, extra settlement names to recognise
+- `sons/vent/`: planetary wind pieces, faded into one another
 - `sons/radio/`: recordings for the control radio (.wav, .ogg, .mp3, .flac); empty folder = no radio
 - `config.json`: settings (created on first launch)
 - `profiles.json`: saved profiles (created on first save)
@@ -84,6 +86,8 @@ The page has two tabs: **Camera** and **Sound effects**. Sounds are synthesised 
 | Cockpit ambience | aboard (`InMainShip`) | layered: loops from `sons/ambiance/boucles/` all at once with slowly varying volume, short sounds from `sons/ambiance/ponctuels/` at random on top, long tracks from `sons/ambiance/` one after another (streamed); empty folders: synthesised life support, ventilation, relays, servos |
 | Background alerts | aboard | console beeps, chimes; muffled alarm on danger, overheating, low fuel, interdiction |
 | Control radio | near a station / settlement: `SupercruiseExit` (station), `ApproachSettlement`, no-fire zone, `DockingRequested` → `Docked` (cut when engines shut down); `Undocked` → end of mass lock or leaving the zone; messages from other ships (short transmission) | excerpts from `sons/radio/` run through the radio filter; silent without files |
+| Abandoned settlement | outside the ship (SRV or on foot) at an abandoned site: settlement with no market (`ApproachSettlement`), known base such as INRA or Dav's Hope (`Touchdown`), or abandoned data log scanned; ends in supercruise | files from `sons/abandonne/`; empty folders: synthesised wind and creaking metal |
+| Planetary wind | on foot, outdoors, on a planet with an atmosphere (from journal scans, or EDSM for planets never scanned) | pieces from `sons/vent/` chained with overlapping fade-ins and fade-outs; empty folder: synthesised thin wind |
 | Hangar ambience | docked (`Docked`) | machinery, distant clanks, echoing announcements |
 
 The radio only uses recordings from `sons/radio/`: random 3–8 s excerpts go through the radio filter (narrow band, saturation, muffling, hiss, push-to-talk click). Only use recordings whose use is permitted.

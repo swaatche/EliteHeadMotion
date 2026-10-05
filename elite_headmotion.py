@@ -31,7 +31,7 @@ import time
 import webbrowser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-VERSION = "0.1"  # version du mod : seul endroit à modifier (affichée dans la page de réglages)
+VERSION = "0.3"  # version du mod : seul endroit à modifier (affichée dans la page de réglages)
 
 IS_WINDOWS = os.name == "nt"
 if IS_WINDOWS:
@@ -161,7 +161,9 @@ DEFAULT_CONFIG = {
                     "keep_synth": False, "synth_volume": 0.4},
         "alerts": {"enabled": True, "volume": 0.4, "interval_s": 20.0},
         "radio": {"enabled": True, "volume": 0.6, "muffle": 0.6, "chatter": 0.5},
-        "hangar": {"enabled": True, "volume": 0.5}
+        "hangar": {"enabled": True, "volume": 0.5},
+        "abandoned": {"enabled": True, "volume": 0.6, "spot_interval_s": 20.0},
+        "wind": {"enabled": True, "volume": 0.6, "fade_s": 6.0, "edsm": True}
     },
     "journal_dir": "",
     "tracker_mode": "none",  # none = sans head tracker ; tobii / trackir / other = tracker via OpenTrack
@@ -390,6 +392,8 @@ class JournalWatcher:
         self.last_scan = 0.0
         self.status_mtime = 0.0
         self.flags = 0
+        self.flags2 = 0  # Odyssey : à pied, etc.
+        self.body_name = ""
 
     def _latest(self):
         files = glob.glob(os.path.join(self.folder, "Journal.*.log"))
@@ -425,7 +429,10 @@ class JournalWatcher:
             m = os.path.getmtime(status)
             if m != self.status_mtime:
                 with open(status, encoding="utf-8") as f:
-                    self.flags = int(json.load(f).get("Flags", 0))
+                    st = json.load(f)
+                self.flags = int(st.get("Flags", 0))
+                self.flags2 = int(st.get("Flags2", 0))
+                self.body_name = str(st.get("BodyName", "") or "")
                 self.status_mtime = m
         except (OSError, ValueError, json.JSONDecodeError):
             pass
@@ -813,6 +820,8 @@ def run():
     pygame.mixer.pre_init(44100, -16, 2, 1024)
     pygame.init()
     sound = sound_mod.SoundEngine(SOUNDS_DIR) if sound_mod else None
+    if sound and journal and sound.ok:
+        sound.load_atmospheres(journal_dir, os.path.join(BASE_DIR, "atmospheres.json"))
     if sound:
         print("Bruitages : " + ("prêts (sons perso : " + sound.radio_dir + ")" if sound.ok else sound.error))
     joys = get_joysticks()
@@ -912,6 +921,9 @@ def run():
             if journal and now - last_journal > 0.1:
                 last_journal = now
                 events, flags = journal.poll()
+                if sound:
+                    sound.flags2 = journal.flags2
+                    sound.status_body = journal.body_name
                 for e in events:
                     name = e.get("event")
                     if sound:

@@ -5,6 +5,7 @@ EliteHeadMotion/
 *.spec
 config.json
 profiles.json
+atmospheres.json
 .DS_Store
 
 # Outil de compilation local

@@ -1,0 +1,3 @@
+# Installations abandonnées supplémentaires / Extra abandoned settlements
+# FR : un nom par ligne, tel qu'affiché en jeu. Les bases INRA et les installations abandonnées connues sont déjà intégrées.
+# EN: one name per line, as shown in game. INRA bases and known abandoned settlements are already built in.
